@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal CRM</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface-hover: #242424;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --text-muted: #888;
+      --accent: #6c8cff;
+      --accent-hover: #8aa4ff;
+      --danger: #ff6b6b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 2rem 2rem 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    .toolbar {
+      max-width: 900px;
+      margin: 1rem auto;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 107, 107, 0.1);
+    }
+
+    /* Contact List */
+    .contacts {
+      max-width: 900px;
+      margin: 1rem auto;
+      padding: 0 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .contact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .contact-card:hover {
+      border-color: #3a3a3a;
+      background: var(--surface-hover);
+    }
+
+    .contact-card .name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .contact-card .meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-card .story-preview {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .empty-state p {
+      font-size: 0.85rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      justify-content: center;
+      align-items: start;
+      padding: 4vh 1rem;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      padding: 1.75rem;
+      animation: slideUp 0.2s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .modal-actions .right {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Detail View */
+    .detail-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      justify-content: center;
+      align-items: start;
+      padding: 4vh 1rem;
+      overflow-y: auto;
+    }
+
+    .detail-overlay.active {
+      display: flex;
+    }
+
+    .detail-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 560px;
+      padding: 2rem;
+      animation: slideUp 0.2s ease;
+    }
+
+    .detail-panel h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-field {
+      margin-bottom: 1.25rem;
+    }
+
+    .detail-field .label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.3rem;
+    }
+
+    .detail-field .value {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .detail-field .value.empty {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Encounters Section */
+    .encounters-section {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .encounters-section h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .encounter-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .encounter-item .encounter-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .encounter-item .encounter-said {
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+    }
+
+    /* Encounter Modal */
+    .encounter-form textarea {
+      min-height: 100px;
+    }
+
+    /* Stats bar */
+    .stats {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Export/Import */
+    .data-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 600px) {
+      header, .toolbar, .contacts, .stats { padding-left: 1rem; padding-right: 1rem; }
+      .toolbar { flex-wrap: wrap; }
+      .search-box { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Personal CRM</h1>
+    <p>Remember everyone you meet</p>
+  </header>
+
+  <div class="toolbar">
+    <input type="text" class="search-box" id="searchBox" placeholder="Search by name, story, or introducer...">
+    <button class="btn btn-primary" onclick="openAddModal()">+ New Contact</button>
+    <div class="data-actions">
+      <button class="btn btn-secondary btn-sm" onclick="exportData()">Export</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">Import</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <div class="contacts" id="contactList"></div>
+
+  <!-- Add/Edit Contact Modal -->
+  <div class="modal-overlay" id="contactModal">
+    <div class="modal">
+      <h2 id="modalTitle">New Contact</h2>
+      <input type="hidden" id="editId">
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" id="fieldName" placeholder="Their name">
+      </div>
+      <div class="form-group">
+        <label>Date Met</label>
+        <input type="date" id="fieldDate">
+      </div>
+      <div class="form-group">
+        <label>Introduced By</label>
+        <input type="text" id="fieldIntroducedBy" placeholder="Who introduced you?">
+      </div>
+      <div class="form-group">
+        <label>Their Story</label>
+        <textarea id="fieldStory" placeholder="What's their background? What do they do?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>What They Said</label>
+        <textarea id="fieldSaid" placeholder="Notable things they said when you met..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Tags</label>
+        <input type="text" id="fieldTags" placeholder="e.g. tech, investor, friend (comma-separated)">
+      </div>
+      <div class="modal-actions">
+        <div>
+          <button class="btn btn-danger" id="deleteBtn" onclick="deleteContact()" style="display:none">Delete</button>
+        </div>
+        <div class="right">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveContact()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Detail View -->
+  <div class="detail-overlay" id="detailOverlay">
+    <div class="detail-panel" id="detailPanel"></div>
+  </div>
+
+  <!-- Add Encounter Modal -->
+  <div class="modal-overlay" id="encounterModal">
+    <div class="modal">
+      <h2>Log New Encounter</h2>
+      <input type="hidden" id="encContactId">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="encDate">
+      </div>
+      <div class="form-group">
+        <label>What happened / what they said</label>
+        <textarea class="encounter-form" id="encNotes" placeholder="Notes from this encounter..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <div></div>
+        <div class="right">
+          <button class="btn btn-secondary" onclick="closeEncounterModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEncounter()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data layer
+    function getContacts() {
+      return JSON.parse(localStorage.getItem('crm_contacts') || '[]');
+    }
+
+    function saveContacts(contacts) {
+      localStorage.setItem('crm_contacts', JSON.stringify(contacts));
+    }
+
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    // Render
+    function render() {
+      const contacts = getContacts();
+      const query = document.getElementById('searchBox').value.toLowerCase();
+
+      const filtered = contacts.filter(c => {
+        if (!query) return true;
+        return (
+          c.name.toLowerCase().includes(query) ||
+          (c.story || '').toLowerCase().includes(query) ||
+          (c.introducedBy || '').toLowerCase().includes(query) ||
+          (c.said || '').toLowerCase().includes(query) ||
+          (c.tags || []).some(t => t.toLowerCase().includes(query))
+        );
+      });
+
+      // Sort by most recently met/added
+      filtered.sort((a, b) => new Date(b.dateMet || b.createdAt) - new Date(a.dateMet || a.createdAt));
+
+      const list = document.getElementById('contactList');
+      const stats = document.getElementById('stats');
+
+      stats.textContent = `${contacts.length} contact${contacts.length !== 1 ? 's' : ''}${query ? ` · ${filtered.length} matching` : ''}`;
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <h2>${query ? 'No matches found' : 'No contacts yet'}</h2>
+            <p>${query ? 'Try a different search term' : 'Click "+ New Contact" to add someone you met'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = filtered.map(c => {
+        const encounterCount = (c.encounters || []).length;
+        return `
+          <div class="contact-card" onclick="openDetail('${c.id}')">
+            <div class="name">${escapeHtml(c.name)}</div>
+            <div class="meta">
+              ${c.dateMet ? `<span>Met ${formatDate(c.dateMet)}</span>` : ''}
+              ${c.introducedBy ? `<span>Via ${escapeHtml(c.introducedBy)}</span>` : ''}
+              ${c.tags && c.tags.length ? `<span>${c.tags.map(t => '#' + escapeHtml(t)).join(' ')}</span>` : ''}
+              ${encounterCount ? `<span>${encounterCount} encounter${encounterCount > 1 ? 's' : ''}</span>` : ''}
+            </div>
+            ${c.story ? `<div class="story-preview">${escapeHtml(c.story)}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Modal: Add/Edit
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'New Contact';
+      document.getElementById('editId').value = '';
+      document.getElementById('fieldName').value = '';
+      document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('fieldIntroducedBy').value = '';
+      document.getElementById('fieldStory').value = '';
+      document.getElementById('fieldSaid').value = '';
+      document.getElementById('fieldTags').value = '';
+      document.getElementById('deleteBtn').style.display = 'none';
+      document.getElementById('contactModal').classList.add('active');
+      setTimeout(() => document.getElementById('fieldName').focus(), 100);
+    }
+
+    function openEditModal(id) {
+      const contacts = getContacts();
+      const c = contacts.find(x => x.id === id);
+      if (!c) return;
+
+      document.getElementById('modalTitle').textContent = 'Edit Contact';
+      document.getElementById('editId').value = c.id;
+      document.getElementById('fieldName').value = c.name;
+      document.getElementById('fieldDate').value = c.dateMet || '';
+      document.getElementById('fieldIntroducedBy').value = c.introducedBy || '';
+      document.getElementById('fieldStory').value = c.story || '';
+      document.getElementById('fieldSaid').value = c.said || '';
+      document.getElementById('fieldTags').value = (c.tags || []).join(', ');
+      document.getElementById('deleteBtn').style.display = 'inline-block';
+      document.getElementById('contactModal').classList.add('active');
+      closeDetail();
+    }
+
+    function closeModal() {
+      document.getElementById('contactModal').classList.remove('active');
+    }
+
+    function saveContact() {
+      const name = document.getElementById('fieldName').value.trim();
+      if (!name) { document.getElementById('fieldName').focus(); return; }
+
+      const contacts = getContacts();
+      const editId = document.getElementById('editId').value;
+      const tagsRaw = document.getElementById('fieldTags').value;
+      const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+      if (editId) {
+        const idx = contacts.findIndex(c => c.id === editId);
+        if (idx !== -1) {
+          contacts[idx].name = name;
+          contacts[idx].dateMet = document.getElementById('fieldDate').value;
+          contacts[idx].introducedBy = document.getElementById('fieldIntroducedBy').value.trim();
+          contacts[idx].story = document.getElementById('fieldStory').value.trim();
+          contacts[idx].said = document.getElementById('fieldSaid').value.trim();
+          contacts[idx].tags = tags;
+          contacts[idx].updatedAt = new Date().toISOString();
+        }
+      } else {
+        contacts.push({
+          id: generateId(),
+          name,
+          dateMet: document.getElementById('fieldDate').value,
+          introducedBy: document.getElementById('fieldIntroducedBy').value.trim(),
+          story: document.getElementById('fieldStory').value.trim(),
+          said: document.getElementById('fieldSaid').value.trim(),
+          tags,
+          encounters: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      saveContacts(contacts);
+      closeModal();
+      render();
+    }
+
+    function deleteContact() {
+      const editId = document.getElementById('editId').value;
+      if (!editId) return;
+      if (!confirm('Delete this contact?')) return;
+
+      const contacts = getContacts().filter(c => c.id !== editId);
+      saveContacts(contacts);
+      closeModal();
+      render();
+    }
+
+    // Detail view
+    function openDetail(id) {
+      const contacts = getContacts();
+      const c = contacts.find(x => x.id === id);
+      if (!c) return;
+
+      const encounters = (c.encounters || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      document.getElementById('detailPanel').innerHTML = `
+        <h2>${escapeHtml(c.name)}</h2>
+        <div class="detail-field">
+          <div class="label">Date Met</div>
+          <div class="value ${!c.dateMet ? 'empty' : ''}">${c.dateMet ? formatDate(c.dateMet) : 'Not recorded'}</div>
+        </div>
+        <div class="detail-field">
+          <div class="label">Introduced By</div>
+          <div class="value ${!c.introducedBy ? 'empty' : ''}">${c.introducedBy ? escapeHtml(c.introducedBy) : 'Not recorded'}</div>
+        </div>
+        <div class="detail-field">
+          <div class="label">Their Story</div>
+          <div class="value ${!c.story ? 'empty' : ''}">${c.story ? escapeHtml(c.story) : 'Not recorded'}</div>
+        </div>
+        <div class="detail-field">
+          <div class="label">What They Said</div>
+          <div class="value ${!c.said ? 'empty' : ''}">${c.said ? escapeHtml(c.said) : 'Not recorded'}</div>
+        </div>
+        ${c.tags && c.tags.length ? `
+        <div class="detail-field">
+          <div class="label">Tags</div>
+          <div class="value">${c.tags.map(t => '#' + escapeHtml(t)).join('  ')}</div>
+        </div>
+        ` : ''}
+        <div class="encounters-section">
+          <h3>
+            <span>Encounters (${encounters.length})</span>
+            <button class="btn btn-secondary btn-sm" onclick="openEncounterModal('${c.id}')">+ Log Encounter</button>
+          </h3>
+          ${encounters.length === 0
+            ? '<p style="color:var(--text-muted);font-size:0.85rem">No follow-up encounters logged yet.</p>'
+            : encounters.map(e => `
+              <div class="encounter-item">
+                <div class="encounter-date">${formatDate(e.date)}</div>
+                <div class="encounter-said">${escapeHtml(e.notes)}</div>
+              </div>
+            `).join('')
+          }
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-primary btn-sm" onclick="openEditModal('${c.id}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="closeDetail()">Close</button>
+        </div>
+      `;
+
+      document.getElementById('detailOverlay').classList.add('active');
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('active');
+    }
+
+    // Encounters
+    function openEncounterModal(contactId) {
+      document.getElementById('encContactId').value = contactId;
+      document.getElementById('encDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('encNotes').value = '';
+      document.getElementById('encounterModal').classList.add('active');
+      closeDetail();
+      setTimeout(() => document.getElementById('encNotes').focus(), 100);
+    }
+
+    function closeEncounterModal() {
+      document.getElementById('encounterModal').classList.remove('active');
+    }
+
+    function saveEncounter() {
+      const contactId = document.getElementById('encContactId').value;
+      const notes = document.getElementById('encNotes').value.trim();
+      if (!notes) { document.getElementById('encNotes').focus(); return; }
+
+      const contacts = getContacts();
+      const c = contacts.find(x => x.id === contactId);
+      if (!c) return;
+
+      if (!c.encounters) c.encounters = [];
+      c.encounters.push({
+        id: generateId(),
+        date: document.getElementById('encDate').value,
+        notes,
+      });
+      c.updatedAt = new Date().toISOString();
+
+      saveContacts(contacts);
+      closeEncounterModal();
+      openDetail(contactId);
+      render();
+    }
+
+    // Export / Import
+    function exportData() {
+      const data = JSON.stringify(getContacts(), null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `crm-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) throw new Error('Invalid format');
+
+          const existing = getContacts();
+          const existingIds = new Set(existing.map(c => c.id));
+          let added = 0;
+
+          for (const c of imported) {
+            if (!c.id || !c.name) continue;
+            if (existingIds.has(c.id)) continue;
+            existing.push(c);
+            added++;
+          }
+
+          saveContacts(existing);
+          render();
+          alert(`Imported ${added} new contact(s). ${imported.length - added} skipped (duplicates or invalid).`);
+        } catch {
+          alert('Invalid file. Please use a JSON file exported from this app.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // Helpers
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // Close modals on backdrop click
+    document.getElementById('contactModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+    document.getElementById('detailOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeDetail();
+    });
+    document.getElementById('encounterModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEncounterModal();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeDetail();
+        closeEncounterModal();
+      }
+    });
+
+    // Search
+    document.getElementById('searchBox').addEventListener('input', render);
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
