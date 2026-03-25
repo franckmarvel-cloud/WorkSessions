@@ -3,188 +3,396 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal CRM</title>
+  <title>My People - Personal CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f0f0f;
-      --surface: #1a1a1a;
-      --surface-hover: #242424;
-      --border: #2a2a2a;
-      --text: #e8e8e8;
-      --text-muted: #888;
-      --accent: #6c8cff;
-      --accent-hover: #8aa4ff;
-      --danger: #ff6b6b;
+      --bg: #faf8f5;
+      --surface: #ffffff;
+      --surface-hover: #f5f0eb;
+      --border: #e8e0d8;
+      --text: #2d2a26;
+      --text-soft: #6b6560;
+      --text-muted: #9b9490;
+      --accent: #e07850;
+      --accent-hover: #c8683f;
+      --accent-light: #fef0ea;
+      --purple: #7c6bce;
+      --purple-light: #f0eefa;
+      --green: #5ba87a;
+      --green-light: #eaf6ef;
+      --danger: #d94848;
+      --danger-light: #fdeaea;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+      --radius: 14px;
+      --radius-sm: 10px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
+    /* Header */
     header {
-      padding: 2rem 2rem 1rem;
-      max-width: 900px;
-      margin: 0 auto;
+      background: linear-gradient(135deg, #e07850 0%, #c8683f 100%);
+      color: white;
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+    }
+
+    header .logo {
+      font-size: 2.2rem;
+      margin-bottom: 0.3rem;
     }
 
     header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 1.6rem;
+      font-weight: 700;
       letter-spacing: -0.02em;
     }
 
     header p {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
+      opacity: 0.85;
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+      font-weight: 400;
     }
 
-    .toolbar {
-      max-width: 900px;
-      margin: 1rem auto;
-      padding: 0 2rem;
+    /* Container */
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* Add Button - Big and Friendly */
+    .add-section {
+      margin-top: -1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 1rem;
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
       display: flex;
-      gap: 0.75rem;
       align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-family: inherit;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-add:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-add .plus-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    /* Search */
+    .search-section {
+      margin-bottom: 1rem;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1rem;
     }
 
     .search-box {
-      flex: 1;
-      padding: 0.6rem 1rem;
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.75rem;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
       color: var(--text);
-      font-size: 0.875rem;
+      font-size: 0.95rem;
+      font-family: inherit;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
     }
 
     .search-box:focus {
       border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
     }
 
-    .btn {
-      padding: 0.6rem 1.2rem;
-      border: none;
+    .search-box::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Stats & Data Actions */
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding: 0 0.25rem;
+    }
+
+    .stats {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .data-actions {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .btn-tiny {
+      padding: 0.35rem 0.7rem;
+      border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 0.875rem;
+      background: var(--surface);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      font-family: inherit;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.15s;
+    }
+
+    .btn-tiny:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+
+    /* Contact Cards */
+    .contacts {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      padding-bottom: 3rem;
+    }
+
+    .contact-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .contact-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .contact-card:active {
+      transform: translateY(0);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-name {
+      font-weight: 650;
+      font-size: 1.05rem;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .card-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.15rem;
+    }
+
+    .card-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .card-story {
+      font-size: 0.88rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .tag {
+      padding: 0.2rem 0.6rem;
+      background: var(--purple-light);
+      color: var(--purple);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+    }
+
+    .empty-state .illustration {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.7rem 1.4rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
     .btn-primary {
       background: var(--accent);
       color: #fff;
+      box-shadow: 0 2px 8px rgba(224, 120, 80, 0.3);
     }
 
     .btn-primary:hover {
       background: var(--accent-hover);
+      box-shadow: 0 4px 12px rgba(224, 120, 80, 0.4);
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
       background: var(--surface);
       color: var(--text);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
     }
 
     .btn-secondary:hover {
       background: var(--surface-hover);
+      border-color: var(--text-muted);
     }
 
     .btn-danger {
-      background: transparent;
+      background: var(--danger-light);
       color: var(--danger);
-      font-size: 0.8rem;
-      padding: 0.4rem 0.8rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
     }
 
     .btn-danger:hover {
-      background: rgba(255, 107, 107, 0.1);
+      background: #f9d4d4;
     }
 
-    /* Contact List */
-    .contacts {
-      max-width: 900px;
-      margin: 1rem auto;
-      padding: 0 2rem 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .contact-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.25rem;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-    }
-
-    .contact-card:hover {
-      border-color: #3a3a3a;
-      background: var(--surface-hover);
-    }
-
-    .contact-card .name {
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 0.35rem;
-    }
-
-    .contact-card .meta {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .contact-card .story-preview {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 4rem 1rem;
-      color: var(--text-muted);
-    }
-
-    .empty-state h2 {
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .empty-state p {
+    .btn-sm {
+      padding: 0.5rem 1rem;
       font-size: 0.85rem;
     }
 
-    /* Modal */
+    /* Modal Overlay */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(45, 42, 38, 0.4);
+      backdrop-filter: blur(6px);
       z-index: 100;
       justify-content: center;
       align-items: start;
-      padding: 4vh 1rem;
+      padding: 3vh 1rem;
       overflow-y: auto;
     }
 
@@ -194,68 +402,83 @@
 
     .modal {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 18px;
       width: 100%;
-      max-width: 520px;
-      padding: 1.75rem;
-      animation: slideUp 0.2s ease;
+      max-width: 500px;
+      padding: 2rem;
+      animation: modalIn 0.25s ease;
+      box-shadow: var(--shadow-lg);
     }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .modal h2 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin-bottom: 1.25rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--text);
     }
 
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.1rem;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-bottom: 0.35rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 0.4rem;
     }
 
     .form-group input,
     .form-group textarea {
       width: 100%;
-      padding: 0.6rem 0.85rem;
+      padding: 0.75rem 1rem;
       background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
       color: var(--text);
-      font-size: 0.875rem;
+      font-size: 0.95rem;
       font-family: inherit;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s;
     }
 
     .form-group input:focus,
     .form-group textarea:focus {
       border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+      background: white;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--text-muted);
     }
 
     .form-group textarea {
-      min-height: 80px;
+      min-height: 90px;
       resize: vertical;
+      line-height: 1.5;
+    }
+
+    .form-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
     }
 
     .modal-actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 1.5rem;
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
     }
 
     .modal-actions .right {
@@ -268,12 +491,12 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(45, 42, 38, 0.4);
+      backdrop-filter: blur(6px);
       z-index: 100;
       justify-content: center;
       align-items: start;
-      padding: 4vh 1rem;
+      padding: 3vh 1rem;
       overflow-y: auto;
     }
 
@@ -283,42 +506,73 @@
 
     .detail-panel {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 18px;
       width: 100%;
-      max-width: 560px;
+      max-width: 540px;
       padding: 2rem;
-      animation: slideUp 0.2s ease;
+      animation: modalIn 0.25s ease;
+      box-shadow: var(--shadow-lg);
     }
 
-    .detail-panel h2 {
-      font-size: 1.3rem;
-      font-weight: 600;
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       margin-bottom: 1.5rem;
     }
 
+    .detail-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .detail-header h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0;
+    }
+
     .detail-field {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.15rem;
+      padding: 0.85rem 1rem;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
     }
 
     .detail-field .label {
       font-size: 0.75rem;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       margin-bottom: 0.3rem;
     }
 
     .detail-field .value {
-      font-size: 0.9rem;
-      line-height: 1.5;
+      font-size: 0.92rem;
+      line-height: 1.55;
       white-space: pre-wrap;
+      color: var(--text);
     }
 
     .detail-field .value.empty {
       color: var(--text-muted);
       font-style: italic;
+    }
+
+    .detail-tags {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
     }
 
     .detail-actions {
@@ -329,129 +583,138 @@
       border-top: 1px solid var(--border);
     }
 
-    /* Encounters Section */
+    /* Encounters */
     .encounters-section {
       margin-top: 1.5rem;
-      padding-top: 1rem;
+      padding-top: 1.25rem;
       border-top: 1px solid var(--border);
     }
 
-    .encounters-section h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
+    .encounters-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .encounters-header h3 {
+      font-size: 0.95rem;
+      font-weight: 650;
+      color: var(--text);
     }
 
     .encounter-item {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.85rem;
+      background: var(--green-light);
+      border: 1px solid #d0e8da;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
       margin-bottom: 0.5rem;
     }
 
     .encounter-item .encounter-date {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-bottom: 0.3rem;
+      font-size: 0.78rem;
+      color: var(--green);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
     }
 
     .encounter-item .encounter-said {
-      font-size: 0.85rem;
-      line-height: 1.4;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--text);
     }
 
-    .btn-sm {
-      padding: 0.35rem 0.75rem;
-      font-size: 0.78rem;
-    }
-
-    /* Encounter Modal */
-    .encounter-form textarea {
-      min-height: 100px;
-    }
-
-    /* Stats bar */
-    .stats {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      font-size: 0.8rem;
+    .no-encounters {
       color: var(--text-muted);
+      font-size: 0.88rem;
+      font-style: italic;
+      padding: 0.5rem 0;
     }
 
-    /* Export/Import */
-    .data-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
+    /* Mobile */
     @media (max-width: 600px) {
-      header, .toolbar, .contacts, .stats { padding-left: 1rem; padding-right: 1rem; }
-      .toolbar { flex-wrap: wrap; }
-      .search-box { min-width: 100%; }
+      header { padding: 2rem 1.25rem 1.5rem; }
+      header h1 { font-size: 1.4rem; }
+      .container { padding: 0 1rem; }
+      .modal, .detail-panel { padding: 1.5rem; }
+      .card-top { gap: 0.7rem; }
+      .avatar { width: 40px; height: 40px; font-size: 0.95rem; }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Personal CRM</h1>
-    <p>Remember everyone you meet</p>
+    <div class="logo">&#128203;</div>
+    <h1>My People</h1>
+    <p>Remember every person you meet</p>
   </header>
 
-  <div class="toolbar">
-    <input type="text" class="search-box" id="searchBox" placeholder="Search by name, story, or introducer...">
-    <button class="btn btn-primary" onclick="openAddModal()">+ New Contact</button>
-    <div class="data-actions">
-      <button class="btn btn-secondary btn-sm" onclick="exportData()">Export</button>
-      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">Import</button>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  <div class="container">
+    <div class="add-section">
+      <button class="btn-add" onclick="openAddModal()">
+        <span class="plus-icon">+</span>
+        I just met someone new!
+      </button>
     </div>
-  </div>
 
-  <div class="stats" id="stats"></div>
-  <div class="contacts" id="contactList"></div>
+    <div class="search-section">
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input type="text" class="search-box" id="searchBox" placeholder="Search by name, story, or who introduced you...">
+      </div>
+    </div>
+
+    <div class="info-bar">
+      <div class="stats" id="stats"></div>
+      <div class="data-actions">
+        <button class="btn-tiny" onclick="exportData()">&#128190; Save backup</button>
+        <button class="btn-tiny" onclick="document.getElementById('importFile').click()">&#128194; Load backup</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+    </div>
+
+    <div class="contacts" id="contactList"></div>
+  </div>
 
   <!-- Add/Edit Contact Modal -->
   <div class="modal-overlay" id="contactModal">
     <div class="modal">
-      <h2 id="modalTitle">New Contact</h2>
+      <h2 id="modalTitle">I just met someone!</h2>
       <input type="hidden" id="editId">
       <div class="form-group">
-        <label>Name *</label>
-        <input type="text" id="fieldName" placeholder="Their name">
+        <label>What's their name?</label>
+        <input type="text" id="fieldName" placeholder="e.g. Sarah Chen">
       </div>
       <div class="form-group">
-        <label>Date Met</label>
+        <label>When did you meet?</label>
         <input type="date" id="fieldDate">
       </div>
       <div class="form-group">
-        <label>Introduced By</label>
-        <input type="text" id="fieldIntroducedBy" placeholder="Who introduced you?">
+        <label>Who introduced you?</label>
+        <input type="text" id="fieldIntroducedBy" placeholder="e.g. My friend Alex, at a dinner party">
+        <div class="form-hint">Leave blank if you met on your own</div>
       </div>
       <div class="form-group">
-        <label>Their Story</label>
-        <textarea id="fieldStory" placeholder="What's their background? What do they do?"></textarea>
+        <label>Their story</label>
+        <textarea id="fieldStory" placeholder="What do they do? Where are they from? What's interesting about them?"></textarea>
       </div>
       <div class="form-group">
-        <label>What They Said</label>
-        <textarea id="fieldSaid" placeholder="Notable things they said when you met..."></textarea>
+        <label>What did they say?</label>
+        <textarea id="fieldSaid" placeholder="Anything memorable they mentioned..."></textarea>
       </div>
       <div class="form-group">
         <label>Tags</label>
-        <input type="text" id="fieldTags" placeholder="e.g. tech, investor, friend (comma-separated)">
+        <input type="text" id="fieldTags" placeholder="e.g. designer, NYC, coffee lover">
+        <div class="form-hint">Separate with commas to help you find them later</div>
       </div>
       <div class="modal-actions">
         <div>
-          <button class="btn btn-danger" id="deleteBtn" onclick="deleteContact()" style="display:none">Delete</button>
+          <button class="btn btn-danger" id="deleteBtn" onclick="deleteContact()" style="display:none">Remove</button>
         </div>
         <div class="right">
           <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary" onclick="saveContact()">Save</button>
+          <button class="btn btn-primary" onclick="saveContact()">Save this person</button>
         </div>
       </div>
     </div>
@@ -465,27 +728,40 @@
   <!-- Add Encounter Modal -->
   <div class="modal-overlay" id="encounterModal">
     <div class="modal">
-      <h2>Log New Encounter</h2>
+      <h2>I saw them again!</h2>
       <input type="hidden" id="encContactId">
       <div class="form-group">
-        <label>Date</label>
+        <label>When?</label>
         <input type="date" id="encDate">
       </div>
       <div class="form-group">
-        <label>What happened / what they said</label>
-        <textarea class="encounter-form" id="encNotes" placeholder="Notes from this encounter..."></textarea>
+        <label>What happened?</label>
+        <textarea id="encNotes" placeholder="What did you talk about? What did they share? How was the meeting?" style="min-height:120px"></textarea>
       </div>
       <div class="modal-actions">
         <div></div>
         <div class="right">
           <button class="btn btn-secondary" onclick="closeEncounterModal()">Cancel</button>
-          <button class="btn btn-primary" onclick="saveEncounter()">Save</button>
+          <button class="btn btn-primary" onclick="saveEncounter()">Save encounter</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    // Color palette for avatars
+    const COLORS = ['#e07850','#7c6bce','#5ba87a','#d4a843','#c75b8e','#5b8ec7','#8b6b4a','#6bae9e'];
+
+    function getColor(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      return COLORS[Math.abs(hash) % COLORS.length];
+    }
+
+    function getInitials(name) {
+      return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    }
+
     // Data layer
     function getContacts() {
       return JSON.parse(localStorage.getItem('crm_contacts') || '[]');
@@ -515,19 +791,19 @@
         );
       });
 
-      // Sort by most recently met/added
       filtered.sort((a, b) => new Date(b.dateMet || b.createdAt) - new Date(a.dateMet || a.createdAt));
 
       const list = document.getElementById('contactList');
       const stats = document.getElementById('stats');
 
-      stats.textContent = `${contacts.length} contact${contacts.length !== 1 ? 's' : ''}${query ? ` · ${filtered.length} matching` : ''}`;
+      stats.textContent = `${contacts.length} person${contacts.length !== 1 ? 's' : ''} remembered${query ? ` \u00b7 ${filtered.length} found` : ''}`;
 
       if (filtered.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
-            <h2>${query ? 'No matches found' : 'No contacts yet'}</h2>
-            <p>${query ? 'Try a different search term' : 'Click "+ New Contact" to add someone you met'}</p>
+            <div class="illustration">${query ? '\ud83d\udd0d' : '\ud83e\udd1d'}</div>
+            <h2>${query ? 'Nobody matches that search' : 'Your people list is empty'}</h2>
+            <p>${query ? 'Try different words or check the spelling' : 'Tap the button above next time you meet someone interesting!'}</p>
           </div>
         `;
         return;
@@ -535,16 +811,24 @@
 
       list.innerHTML = filtered.map(c => {
         const encounterCount = (c.encounters || []).length;
+        const color = getColor(c.name);
         return `
           <div class="contact-card" onclick="openDetail('${c.id}')">
-            <div class="name">${escapeHtml(c.name)}</div>
-            <div class="meta">
-              ${c.dateMet ? `<span>Met ${formatDate(c.dateMet)}</span>` : ''}
-              ${c.introducedBy ? `<span>Via ${escapeHtml(c.introducedBy)}</span>` : ''}
-              ${c.tags && c.tags.length ? `<span>${c.tags.map(t => '#' + escapeHtml(t)).join(' ')}</span>` : ''}
-              ${encounterCount ? `<span>${encounterCount} encounter${encounterCount > 1 ? 's' : ''}</span>` : ''}
+            <div class="card-top">
+              <div class="avatar" style="background:${color}">${getInitials(c.name)}</div>
+              <div class="card-info">
+                <div class="card-name">${escapeHtml(c.name)}</div>
+                <div class="card-meta">
+                  ${c.dateMet ? `<span>\ud83d\udcc5 ${formatDate(c.dateMet)}</span>` : ''}
+                  ${c.introducedBy ? `<span>\ud83d\udc64 Via ${escapeHtml(c.introducedBy)}</span>` : ''}
+                  ${encounterCount ? `<span>\ud83d\udd04 ${encounterCount} encounter${encounterCount > 1 ? 's' : ''}</span>` : ''}
+                </div>
+              </div>
             </div>
-            ${c.story ? `<div class="story-preview">${escapeHtml(c.story)}</div>` : ''}
+            ${c.story ? `<div class="card-story">${escapeHtml(c.story)}</div>` : ''}
+            ${c.tags && c.tags.length ? `
+              <div class="card-tags">${c.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+            ` : ''}
           </div>
         `;
       }).join('');
@@ -552,7 +836,7 @@
 
     // Modal: Add/Edit
     function openAddModal() {
-      document.getElementById('modalTitle').textContent = 'New Contact';
+      document.getElementById('modalTitle').textContent = 'I just met someone!';
       document.getElementById('editId').value = '';
       document.getElementById('fieldName').value = '';
       document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
@@ -570,7 +854,7 @@
       const c = contacts.find(x => x.id === id);
       if (!c) return;
 
-      document.getElementById('modalTitle').textContent = 'Edit Contact';
+      document.getElementById('modalTitle').textContent = 'Edit this person';
       document.getElementById('editId').value = c.id;
       document.getElementById('fieldName').value = c.name;
       document.getElementById('fieldDate').value = c.dateMet || '';
@@ -578,7 +862,7 @@
       document.getElementById('fieldStory').value = c.story || '';
       document.getElementById('fieldSaid').value = c.said || '';
       document.getElementById('fieldTags').value = (c.tags || []).join(', ');
-      document.getElementById('deleteBtn').style.display = 'inline-block';
+      document.getElementById('deleteBtn').style.display = 'inline-flex';
       document.getElementById('contactModal').classList.add('active');
       closeDetail();
     }
@@ -589,7 +873,11 @@
 
     function saveContact() {
       const name = document.getElementById('fieldName').value.trim();
-      if (!name) { document.getElementById('fieldName').focus(); return; }
+      if (!name) {
+        document.getElementById('fieldName').style.borderColor = 'var(--danger)';
+        document.getElementById('fieldName').focus();
+        return;
+      }
 
       const contacts = getContacts();
       const editId = document.getElementById('editId').value;
@@ -630,7 +918,7 @@
     function deleteContact() {
       const editId = document.getElementById('editId').value;
       if (!editId) return;
-      if (!confirm('Delete this contact?')) return;
+      if (!confirm('Are you sure you want to remove this person?')) return;
 
       const contacts = getContacts().filter(c => c.id !== editId);
       saveContacts(contacts);
@@ -645,38 +933,41 @@
       if (!c) return;
 
       const encounters = (c.encounters || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+      const color = getColor(c.name);
 
       document.getElementById('detailPanel').innerHTML = `
-        <h2>${escapeHtml(c.name)}</h2>
-        <div class="detail-field">
-          <div class="label">Date Met</div>
-          <div class="value ${!c.dateMet ? 'empty' : ''}">${c.dateMet ? formatDate(c.dateMet) : 'Not recorded'}</div>
+        <div class="detail-header">
+          <div class="detail-avatar" style="background:${color}">${getInitials(c.name)}</div>
+          <div>
+            <h2>${escapeHtml(c.name)}</h2>
+            ${c.dateMet ? `<div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.15rem">\ud83d\udcc5 Met ${formatDate(c.dateMet)}</div>` : ''}
+          </div>
         </div>
+
+        ${c.tags && c.tags.length ? `
+          <div class="detail-tags">${c.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+        ` : ''}
+
         <div class="detail-field">
-          <div class="label">Introduced By</div>
+          <div class="label">Introduced by</div>
           <div class="value ${!c.introducedBy ? 'empty' : ''}">${c.introducedBy ? escapeHtml(c.introducedBy) : 'Not recorded'}</div>
         </div>
         <div class="detail-field">
-          <div class="label">Their Story</div>
+          <div class="label">Their story</div>
           <div class="value ${!c.story ? 'empty' : ''}">${c.story ? escapeHtml(c.story) : 'Not recorded'}</div>
         </div>
         <div class="detail-field">
-          <div class="label">What They Said</div>
+          <div class="label">What they said</div>
           <div class="value ${!c.said ? 'empty' : ''}">${c.said ? escapeHtml(c.said) : 'Not recorded'}</div>
         </div>
-        ${c.tags && c.tags.length ? `
-        <div class="detail-field">
-          <div class="label">Tags</div>
-          <div class="value">${c.tags.map(t => '#' + escapeHtml(t)).join('  ')}</div>
-        </div>
-        ` : ''}
+
         <div class="encounters-section">
-          <h3>
-            <span>Encounters (${encounters.length})</span>
-            <button class="btn btn-secondary btn-sm" onclick="openEncounterModal('${c.id}')">+ Log Encounter</button>
-          </h3>
+          <div class="encounters-header">
+            <h3>\ud83d\udcc6 Encounters (${encounters.length})</h3>
+            <button class="btn btn-primary btn-sm" onclick="openEncounterModal('${c.id}')">+ I saw them again</button>
+          </div>
           ${encounters.length === 0
-            ? '<p style="color:var(--text-muted);font-size:0.85rem">No follow-up encounters logged yet.</p>'
+            ? '<p class="no-encounters">No follow-up encounters yet. Tap the button above when you see them again!</p>'
             : encounters.map(e => `
               <div class="encounter-item">
                 <div class="encounter-date">${formatDate(e.date)}</div>
@@ -685,8 +976,9 @@
             `).join('')
           }
         </div>
+
         <div class="detail-actions">
-          <button class="btn btn-primary btn-sm" onclick="openEditModal('${c.id}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="openEditModal('${c.id}')">Edit</button>
           <button class="btn btn-secondary btn-sm" onclick="closeDetail()">Close</button>
         </div>
       `;
@@ -742,7 +1034,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `crm-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `my-people-backup-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -755,7 +1047,7 @@
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (!Array.isArray(imported)) throw new Error('Invalid format');
+          if (!Array.isArray(imported)) throw new Error('Invalid');
 
           const existing = getContacts();
           const existingIds = new Set(existing.map(c => c.id));
@@ -770,9 +1062,9 @@
 
           saveContacts(existing);
           render();
-          alert(`Imported ${added} new contact(s). ${imported.length - added} skipped (duplicates or invalid).`);
+          alert(`Welcome back! Loaded ${added} new person(s). ${imported.length - added} were already here.`);
         } catch {
-          alert('Invalid file. Please use a JSON file exported from this app.');
+          alert('Hmm, that file doesn\u2019t look right. Please use a backup file from this app.');
         }
       };
       reader.readAsText(file);
@@ -803,7 +1095,6 @@
       if (e.target === this) closeEncounterModal();
     });
 
-    // Close on Escape
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeModal();
@@ -812,10 +1103,13 @@
       }
     });
 
-    // Search
+    // Reset border color on input focus
+    document.getElementById('fieldName').addEventListener('focus', function() {
+      this.style.borderColor = '';
+    });
+
     document.getElementById('searchBox').addEventListener('input', render);
 
-    // Initial render
     render();
   </script>
 </body>
