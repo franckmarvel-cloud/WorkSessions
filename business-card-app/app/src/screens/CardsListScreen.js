@@ -10,10 +10,12 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { getCards, getTags } from '../api/client';
+import * as ImagePicker from 'expo-image-picker';
+import { getCards, getTags, scanCard } from '../api/client';
 
 const ACCENT = '#4F46E5';
 
@@ -25,6 +27,8 @@ export default function CardsListScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState(null);
+  const [fabOpen, setFabOpen] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   const fetchCards = useCallback(
     async (query = searchQuery, tag = selectedTag) => {
@@ -83,6 +87,40 @@ export default function CardsListScreen({ navigation }) {
     const next = tag === selectedTag ? null : tag;
     setSelectedTag(next);
     fetchCards(searchQuery, next);
+  };
+
+  const handleScanCard = async () => {
+    setFabOpen(false);
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Camera permission required', 'Please allow camera access in your device settings.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+      base64: true,
+    });
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    if (!asset.base64) {
+      Alert.alert('Error', 'Could not read image data. Please try again.');
+      return;
+    }
+
+    setScanning(true);
+    try {
+      const mediaType = asset.mimeType || 'image/jpeg';
+      const extracted = await scanCard(asset.base64, mediaType);
+      navigation.navigate('AddCard', { scannedData: extracted });
+    } catch (err) {
+      console.error('Scan error:', err);
+      Alert.alert('Scan failed', 'Could not read the card. Check that the backend is running and ANTHROPIC_API_KEY is set, then try again.');
+    } finally {
+      setScanning(false);
+    }
   };
 
   const renderCardItem = ({ item }) => (
@@ -234,13 +272,54 @@ export default function CardsListScreen({ navigation }) {
         />
       )}
 
-      {/* FAB */}
+      {/* Scanning overlay */}
+      <Modal visible={scanning} transparent animationType="fade">
+        <View style={styles.scanOverlay}>
+          <View style={styles.scanBox}>
+            <ActivityIndicator size="large" color={ACCENT} style={{ marginBottom: 14 }} />
+            <Text style={styles.scanText}>Reading card with AI…</Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Speed-dial backdrop */}
+      {fabOpen && (
+        <TouchableOpacity style={styles.fabBackdrop} activeOpacity={1} onPress={() => setFabOpen(false)} />
+      )}
+
+      {/* Speed-dial actions */}
+      {fabOpen && (
+        <View style={styles.fabActions}>
+          <TouchableOpacity style={styles.fabAction} onPress={handleScanCard} activeOpacity={0.85}>
+            <View style={styles.fabActionLabel}>
+              <Text style={styles.fabActionLabelText}>Scan card</Text>
+            </View>
+            <View style={[styles.fabActionBtn, styles.fabActionBtnScan]}>
+              <Ionicons name="camera-outline" size={22} color="#fff" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.fabAction}
+            onPress={() => { setFabOpen(false); navigation.navigate('AddCard', {}); }}
+            activeOpacity={0.85}
+          >
+            <View style={styles.fabActionLabel}>
+              <Text style={styles.fabActionLabelText}>Enter manually</Text>
+            </View>
+            <View style={styles.fabActionBtn}>
+              <Ionicons name="create-outline" size={22} color="#fff" />
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Main FAB */}
       <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate('AddCard', {})}
+        style={[styles.fab, fabOpen && styles.fabOpen]}
+        onPress={() => setFabOpen(o => !o)}
         activeOpacity={0.85}
       >
-        <Ionicons name="add" size={28} color="#fff" />
+        <Ionicons name={fabOpen ? 'close' : 'add'} size={28} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -438,5 +517,74 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 8,
+  },
+  fabOpen: {
+    backgroundColor: '#374151',
+    shadowColor: '#374151',
+  },
+  fabBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    zIndex: 10,
+  },
+  fabActions: {
+    position: 'absolute',
+    bottom: 96,
+    right: 20,
+    alignItems: 'flex-end',
+    gap: 12,
+    zIndex: 11,
+  },
+  fabAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  fabActionLabel: {
+    backgroundColor: '#1F2937',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  fabActionLabelText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  fabActionBtn: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: ACCENT,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: ACCENT,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  fabActionBtnScan: {
+    backgroundColor: '#059669',
+    shadowColor: '#059669',
+  },
+  scanOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scanBox: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 28,
+    alignItems: 'center',
+    width: 200,
+  },
+  scanText: {
+    fontSize: 15,
+    color: '#374151',
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

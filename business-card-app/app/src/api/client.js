@@ -78,6 +78,19 @@ export async function getTags() {
   return response.data;
 }
 
+// ─── Scan ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Send a base64 image to the backend for AI extraction of business card fields.
+ * @param {string} base64Image - Base64-encoded image data (no data: prefix)
+ * @param {string} [mediaType] - MIME type, defaults to image/jpeg
+ * @returns {Promise<{name,company,job_title,email,phone,website,address}>}
+ */
+export async function scanCard(base64Image, mediaType = 'image/jpeg') {
+  const response = await apiClient.post('/scan', { image: base64Image, mediaType }, { timeout: 30000 });
+  return response.data;
+}
+
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 /**

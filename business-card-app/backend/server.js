@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const Anthropic = require('@anthropic-ai/sdk');
 const { initDb, getDb } = require('./database');
 
 const app = express();
@@ -320,6 +321,55 @@ app.get('/api/export/vcard', (req, res) => {
     res.send(vcfContent);
   } catch (err) {
     console.error('GET /api/export/vcard error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/scan ───────────────────────────────────────────────────────────
+app.post('/api/scan', async (req, res) => {
+  try {
+    const { image, mediaType = 'image/jpeg' } = req.body;
+    if (!image) {
+      return res.status(400).json({ error: 'image field required (base64 string)' });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'ANTHROPIC_API_KEY environment variable not set' });
+    }
+
+    const anthropic = new Anthropic({ apiKey });
+
+    const message = await anthropic.messages.create({
+      model: 'claude-opus-4-7',
+      max_tokens: 512,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: image },
+            },
+            {
+              type: 'text',
+              text: 'Extract all contact information from this business card image. Return ONLY a JSON object with these fields (null for any that are missing or unclear):\n{"name":null,"company":null,"job_title":null,"email":null,"phone":null,"website":null,"address":null}',
+            },
+          ],
+        },
+      ],
+    });
+
+    const text = message.content[0].text.trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(422).json({ error: 'Could not parse card data from image' });
+    }
+
+    const cardData = JSON.parse(jsonMatch[0]);
+    res.json(cardData);
+  } catch (err) {
+    console.error('POST /api/scan error:', err);
     res.status(500).json({ error: err.message });
   }
 });

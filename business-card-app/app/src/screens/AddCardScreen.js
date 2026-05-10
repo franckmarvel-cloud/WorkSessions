@@ -29,17 +29,19 @@ const FIELDS = [
 
 export default function AddCardScreen({ route, navigation }) {
   const existingCard = route.params?.card || null;
+  const scannedData = route.params?.scannedData || null;
   const isEditing = Boolean(existingCard);
+  const seed = existingCard || scannedData || {};
 
   const [form, setForm] = useState({
-    name:      existingCard?.name      || '',
-    company:   existingCard?.company   || '',
-    job_title: existingCard?.job_title || '',
-    email:     existingCard?.email     || '',
-    phone:     existingCard?.phone     || '',
-    website:   existingCard?.website   || '',
-    address:   existingCard?.address   || '',
-    notes:     existingCard?.notes     || '',
+    name:      seed.name      || '',
+    company:   seed.company   || '',
+    job_title: seed.job_title || '',
+    email:     seed.email     || '',
+    phone:     seed.phone     || '',
+    website:   seed.website   || '',
+    address:   seed.address   || '',
+    notes:     seed.notes     || '',
   });
 
   const [tags, setTags] = useState(
@@ -123,6 +125,13 @@ export default function AddCardScreen({ route, navigation }) {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
+        {scannedData && !isEditing && (
+          <View style={styles.scannedBanner}>
+            <Ionicons name="sparkles-outline" size={16} color="#065F46" style={{ marginRight: 8 }} />
+            <Text style={styles.scannedBannerText}>Fields pre-filled from scan — please review before saving.</Text>
+          </View>
+        )}
+
         {FIELDS.map(({ key, label, placeholder, required, multiline, icon, keyboardType, autoCapitalize }) => (
           <View key={key} style={styles.fieldGroup}>
             <View style={styles.labelRow}>
@@ -235,6 +244,21 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingBottom: 40,
+  },
+  scannedBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#D1FAE5',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+  },
+  scannedBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#065F46',
+    fontWeight: '500',
+    lineHeight: 18,
   },
   fieldGroup: {
     marginBottom: 16,
