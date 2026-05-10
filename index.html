@@ -2,1115 +2,665 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My People - Personal CRM</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Business Cards</title>
   <style>
     :root {
-      --bg: #faf8f5;
+      --accent: #4F46E5;
+      --accent-light: #EEF2FF;
+      --green: #059669;
+      --green-light: #D1FAE5;
+      --bg: #F9FAFB;
       --surface: #ffffff;
-      --surface-hover: #f5f0eb;
-      --border: #e8e0d8;
-      --text: #2d2a26;
-      --text-soft: #6b6560;
-      --text-muted: #9b9490;
-      --accent: #e07850;
-      --accent-hover: #c8683f;
-      --accent-light: #fef0ea;
-      --purple: #7c6bce;
-      --purple-light: #f0eefa;
-      --green: #5ba87a;
-      --green-light: #eaf6ef;
-      --danger: #d94848;
-      --danger-light: #fdeaea;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-      --radius: 14px;
-      --radius-sm: 10px;
+      --border: #E5E7EB;
+      --text: #111827;
+      --muted: #6B7280;
+      --faint: #9CA3AF;
+      --danger: #EF4444;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Header */
-    header {
-      background: linear-gradient(135deg, #e07850 0%, #c8683f 100%);
-      color: white;
-      padding: 2.5rem 2rem 2rem;
-      text-align: center;
-    }
-
-    header .logo {
-      font-size: 2.2rem;
-      margin-bottom: 0.3rem;
-    }
-
-    header h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    header p {
-      opacity: 0.85;
-      font-size: 0.95rem;
-      margin-top: 0.3rem;
-      font-weight: 400;
-    }
-
-    /* Container */
-    .container {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 0 1.25rem;
-    }
-
-    /* Add Button - Big and Friendly */
-    .add-section {
-      margin-top: -1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .btn-add {
-      width: 100%;
-      padding: 1rem;
-      background: var(--surface);
-      border: 2px dashed var(--border);
-      border-radius: var(--radius);
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--accent);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
-      font-family: inherit;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-add:hover {
-      background: var(--accent-light);
-      border-color: var(--accent);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-add .plus-icon {
-      width: 28px;
-      height: 28px;
-      background: var(--accent);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      font-weight: 400;
-      line-height: 1;
-    }
-
-    /* Search */
-    .search-section {
-      margin-bottom: 1rem;
-    }
-
-    .search-wrap {
-      position: relative;
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 1rem;
-    }
-
-    .search-box {
-      width: 100%;
-      padding: 0.85rem 1rem 0.85rem 2.75rem;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 0.95rem;
-      font-family: inherit;
-      outline: none;
-      transition: all 0.2s;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .search-box:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-light);
-    }
-
-    .search-box::placeholder {
-      color: var(--text-muted);
-    }
-
-    /* Stats & Data Actions */
-    .info-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-      padding: 0 0.25rem;
-    }
-
-    .stats {
-      font-size: 0.85rem;
-      color: var(--text-soft);
-      font-weight: 500;
-    }
-
-    .data-actions {
-      display: flex;
-      gap: 0.35rem;
-    }
-
-    .btn-tiny {
-      padding: 0.35rem 0.7rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      color: var(--text-soft);
-      font-size: 0.78rem;
-      font-family: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .btn-tiny:hover {
-      background: var(--surface-hover);
-      color: var(--text);
-    }
-
-    /* Contact Cards */
-    .contacts {
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-      padding-bottom: 3rem;
-    }
-
-    .contact-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.1rem 1.25rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: var(--shadow-sm);
-      position: relative;
-    }
-
-    .contact-card:hover {
-      border-color: var(--accent);
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
-    }
-
-    .contact-card:active {
-      transform: translateY(0);
-    }
-
-    .card-top {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: white;
-      flex-shrink: 0;
-    }
-
-    .card-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .card-name {
-      font-weight: 650;
-      font-size: 1.05rem;
-      color: var(--text);
-      line-height: 1.3;
-    }
-
-    .card-meta {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-top: 0.15rem;
-    }
-
-    .card-meta span {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .card-story {
-      font-size: 0.88rem;
-      color: var(--text-soft);
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-top: 0.35rem;
-    }
-
-    .card-tags {
-      display: flex;
-      gap: 0.35rem;
-      flex-wrap: wrap;
-      margin-top: 0.5rem;
-    }
-
-    .tag {
-      padding: 0.2rem 0.6rem;
-      background: var(--purple-light);
-      color: var(--purple);
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 3.5rem 1.5rem;
-    }
-
-    .empty-state .illustration {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .empty-state h2 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-      font-size: 0.95rem;
-      color: var(--text-soft);
-      line-height: 1.5;
-      max-width: 320px;
-      margin: 0 auto;
-    }
-
-    /* Buttons */
-    .btn {
-      padding: 0.7rem 1.4rem;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(224, 120, 80, 0.3);
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-hover);
-      box-shadow: 0 4px 12px rgba(224, 120, 80, 0.4);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text);
-      border: 1.5px solid var(--border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--surface-hover);
-      border-color: var(--text-muted);
-    }
-
-    .btn-danger {
-      background: var(--danger-light);
-      color: var(--danger);
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-    }
-
-    .btn-danger:hover {
-      background: #f9d4d4;
-    }
-
-    .btn-sm {
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-    }
-
-    /* Modal Overlay */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(45, 42, 38, 0.4);
-      backdrop-filter: blur(6px);
-      z-index: 100;
-      justify-content: center;
-      align-items: start;
-      padding: 3vh 1rem;
-      overflow-y: auto;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--surface);
-      border-radius: 18px;
-      width: 100%;
-      max-width: 500px;
-      padding: 2rem;
-      animation: modalIn 0.25s ease;
-      box-shadow: var(--shadow-lg);
-    }
-
-    @keyframes modalIn {
-      from { opacity: 0; transform: translateY(16px) scale(0.97); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .modal h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: var(--text);
-    }
-
-    .form-group {
-      margin-bottom: 1.1rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-soft);
-      margin-bottom: 0.4rem;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 0.95rem;
-      font-family: inherit;
-      outline: none;
-      transition: all 0.2s;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-light);
-      background: white;
-    }
-
-    .form-group input::placeholder,
-    .form-group textarea::placeholder {
-      color: var(--text-muted);
-    }
-
-    .form-group textarea {
-      min-height: 90px;
-      resize: vertical;
-      line-height: 1.5;
-    }
-
-    .form-hint {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 0.3rem;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 1.75rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .modal-actions .right {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    /* Detail View */
-    .detail-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(45, 42, 38, 0.4);
-      backdrop-filter: blur(6px);
-      z-index: 100;
-      justify-content: center;
-      align-items: start;
-      padding: 3vh 1rem;
-      overflow-y: auto;
-    }
-
-    .detail-overlay.active {
-      display: flex;
-    }
-
-    .detail-panel {
-      background: var(--surface);
-      border-radius: 18px;
-      width: 100%;
-      max-width: 540px;
-      padding: 2rem;
-      animation: modalIn 0.25s ease;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .detail-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .detail-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.3rem;
-      color: white;
-      flex-shrink: 0;
-    }
-
-    .detail-header h2 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 0;
-    }
-
-    .detail-field {
-      margin-bottom: 1.15rem;
-      padding: 0.85rem 1rem;
-      background: var(--bg);
-      border-radius: var(--radius-sm);
-    }
-
-    .detail-field .label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.3rem;
-    }
-
-    .detail-field .value {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      color: var(--text);
-    }
-
-    .detail-field .value.empty {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    .detail-tags {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.25rem;
-    }
-
-    .detail-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-    }
-
-    /* Encounters */
-    .encounters-section {
-      margin-top: 1.5rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .encounters-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.85rem;
-    }
-
-    .encounters-header h3 {
-      font-size: 0.95rem;
-      font-weight: 650;
-      color: var(--text);
-    }
-
-    .encounter-item {
-      background: var(--green-light);
-      border: 1px solid #d0e8da;
-      border-radius: var(--radius-sm);
-      padding: 0.85rem 1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .encounter-item .encounter-date {
-      font-size: 0.78rem;
-      color: var(--green);
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    .encounter-item .encounter-said {
-      font-size: 0.88rem;
-      line-height: 1.5;
-      color: var(--text);
-    }
-
-    .no-encounters {
-      color: var(--text-muted);
-      font-size: 0.88rem;
-      font-style: italic;
-      padding: 0.5rem 0;
-    }
-
-    /* Mobile */
-    @media (max-width: 600px) {
-      header { padding: 2rem 1.25rem 1.5rem; }
-      header h1 { font-size: 1.4rem; }
-      .container { padding: 0 1rem; }
-      .modal, .detail-panel { padding: 1.5rem; }
-      .card-top { gap: 0.7rem; }
-      .avatar { width: 40px; height: 40px; font-size: 0.95rem; }
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── Header ── */
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 16px 12px; position: sticky; top: 0; z-index: 100; }
+    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .app-title { font-size: 20px; font-weight: 800; }
+    .card-count { font-size: 13px; color: var(--muted); }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+    .search-input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; color: var(--text); background: var(--bg); outline: none; font-family: inherit; }
+    .search-input:focus { border-color: var(--accent); }
+
+    /* ── Tag filters ── */
+    .tag-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; scrollbar-width: none; }
+    .tag-bar::-webkit-scrollbar { display: none; }
+    .tag-btn { padding: 5px 14px; border-radius: 20px; border: none; background: var(--border); color: #374151; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all .15s; }
+    .tag-btn.active { background: var(--accent); color: #fff; }
+
+    /* ── Cards list ── */
+    .list { padding: 8px 16px 120px; }
+    .card-row { background: var(--surface); border-radius: 12px; padding: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: box-shadow .15s; }
+    .card-row:hover { box-shadow: 0 3px 8px rgba(0,0,0,.1); }
+    .avatar { width: 44px; height: 44px; border-radius: 22px; background: var(--accent); color: #fff; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .card-body { flex: 1; min-width: 0; }
+    .card-name { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-sub { font-size: 13px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-contact { margin-top: 3px; }
+    .contact-row { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--faint); }
+    .tag-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .chip { background: var(--accent-light); color: var(--accent); border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+    .chevron { color: var(--border); flex-shrink: 0; font-size: 20px; }
+
+    /* ── Empty state ── */
+    .empty { display: flex; flex-direction: column; align-items: center; padding: 60px 32px; text-align: center; }
+    .empty-icon { font-size: 60px; opacity: .25; margin-bottom: 14px; }
+    .empty-title { font-size: 20px; font-weight: 700; color: #374151; margin-bottom: 8px; }
+    .empty-sub { font-size: 14px; color: var(--faint); line-height: 1.5; }
+
+    /* ── FAB ── */
+    .fab { position: fixed; bottom: 76px; right: 20px; width: 56px; height: 56px; border-radius: 28px; background: var(--accent); color: #fff; border: none; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(79,70,229,.45); z-index: 200; transition: all .2s; }
+    .fab.open { background: #374151; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+    .fab-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 190; }
+    .fab-actions { position: fixed; bottom: 144px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; z-index: 200; }
+    .fab-action { display: flex; align-items: center; gap: 10px; border: none; background: none; cursor: pointer; padding: 0; }
+    .fab-label { background: #1F2937; color: #fff; border-radius: 8px; padding: 5px 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .fab-mini { width: 46px; height: 46px; border-radius: 23px; background: var(--accent); color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(79,70,229,.35); }
+    .fab-mini.green { background: var(--green); box-shadow: 0 3px 8px rgba(5,150,105,.35); }
+
+    /* ── Bottom nav ── */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 4px 10px; border: none; background: none; cursor: pointer; color: var(--faint); font-size: 11px; font-weight: 600; gap: 2px; }
+    .nav-btn.active { color: var(--accent); }
+    .nav-icon { font-size: 20px; }
+
+    /* ── Modal ── */
+    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+    .modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto; animation: slideUp .25s ease-out; }
+    @media(min-width:600px) { .backdrop { align-items: center; } .modal { border-radius: 20px; max-height: 85vh; } }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 18px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 1; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .close-btn { width: 30px; height: 30px; border-radius: 15px; border: none; background: var(--bg); color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-body { padding: 18px; }
+
+    /* ── Form ── */
+    .field { margin-bottom: 14px; }
+    .f-label { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px; }
+    .f-label .fi { color: var(--accent); }
+    .req { color: var(--danger); }
+    .f-input { width: 100%; padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; color: var(--text); background: var(--surface); outline: none; font-family: inherit; transition: border-color .15s; }
+    .f-input:focus { border-color: var(--accent); }
+    .f-input.err { border-color: var(--danger); }
+    textarea.f-input { min-height: 76px; resize: vertical; }
+    .err-msg { font-size: 12px; color: var(--danger); margin-top: 3px; display: none; }
+    .err-msg.show { display: block; }
+
+    /* Tags in form */
+    .form-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+    .form-chip { display: flex; align-items: center; gap: 4px; background: var(--accent-light); color: var(--accent); border-radius: 20px; padding: 4px 8px 4px 10px; font-size: 13px; font-weight: 600; }
+    .chip-x { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; line-height: 1; padding: 0; }
+    .tag-row { display: flex; gap: 8px; }
+    .tag-inp { flex: 1; padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; color: var(--text); outline: none; font-family: inherit; }
+    .tag-inp:focus { border-color: var(--accent); }
+    .tag-add { padding: 10px 15px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .tag-add:disabled { background: #C7D2FE; cursor: default; }
+
+    .scan-banner { display: flex; align-items: flex-start; gap: 8px; background: var(--green-light); border-radius: 10px; padding: 11px; margin-bottom: 14px; font-size: 13px; color: #065F46; font-weight: 500; line-height: 1.5; }
+
+    .save-btn { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 6px; box-shadow: 0 4px 12px rgba(79,70,229,.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .save-btn:disabled { opacity: .65; cursor: default; }
+
+    /* ── Detail view ── */
+    .detail-actions { display: flex; gap: 8px; margin-bottom: 18px; }
+    .det-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .det-edit { background: var(--accent-light); color: var(--accent); }
+    .det-del { background: #FEE2E2; color: var(--danger); }
+    .det-field { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .det-field:last-child { border-bottom: none; }
+    .det-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .det-content { flex: 1; }
+    .det-lbl { font-size: 11px; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+    .det-val { font-size: 15px; color: var(--text); word-break: break-word; }
+    .det-val a { color: var(--accent); text-decoration: none; }
+
+    /* ── Export tab ── */
+    .exp-wrap { padding: 20px 16px 90px; }
+    .exp-count { text-align: center; color: var(--muted); margin-bottom: 22px; font-size: 15px; }
+    .exp-btn { width: 100%; padding: 18px; border-radius: 16px; border: none; margin-bottom: 13px; cursor: pointer; display: flex; align-items: center; gap: 14px; text-align: left; }
+    .exp-btn:hover { opacity: .92; }
+    .exp-csv { background: var(--accent); color: #fff; }
+    .exp-vcf { background: var(--green); color: #fff; }
+    .exp-icon { width: 50px; height: 50px; border-radius: 25px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .exp-text { flex: 1; }
+    .exp-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+    .exp-desc { font-size: 12px; opacity: .85; line-height: 1.4; }
+
+    /* ── Settings tab ── */
+    .set-wrap { padding: 20px 16px 90px; }
+    .set-info { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 20px; background: var(--surface); border-radius: 12px; padding: 14px; }
+    .set-info a { color: var(--accent); }
+    .set-lbl { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .set-saved { text-align: center; margin-top: 10px; color: var(--green); font-weight: 600; font-size: 14px; display: none; }
+    .set-saved.show { display: block; }
+
+    /* ── Scan overlay ── */
+    .scan-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 500; display: none; align-items: center; justify-content: center; }
+    .scan-overlay.show { display: flex; }
+    .scan-box { background: #fff; border-radius: 16px; padding: 28px; text-align: center; width: 200px; }
+    .spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+    .scan-lbl { font-size: 15px; font-weight: 600; color: #374151; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">&#128203;</div>
-    <h1>My People</h1>
-    <p>Remember every person you meet</p>
-  </header>
+<div id="root"></div>
+<input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none">
 
-  <div class="container">
-    <div class="add-section">
-      <button class="btn-add" onclick="openAddModal()">
-        <span class="plus-icon">+</span>
-        I just met someone new!
-      </button>
-    </div>
+<div class="scan-overlay" id="scan-overlay">
+  <div class="scan-box">
+    <div class="spinner"></div>
+    <div class="scan-lbl">Reading card with AI…</div>
+  </div>
+</div>
 
-    <div class="search-section">
+<script>
+const CARDS_KEY = 'biz_cards_v1';
+const APIKEY_KEY = 'biz_anthropic_key';
+
+function loadCards() {
+  try { return JSON.parse(localStorage.getItem(CARDS_KEY) || '[]'); } catch { return []; }
+}
+function saveCards(c) { localStorage.setItem(CARDS_KEY, JSON.stringify(c)); }
+function loadApiKey() { return localStorage.getItem(APIKEY_KEY) || ''; }
+function saveApiKey(k) { localStorage.setItem(APIKEY_KEY, k); }
+
+let cards = loadCards();
+let tab = 'cards';
+let search = '';
+let activeTag = null;
+let fabOpen = false;
+let modal = null;
+let detailCard = null;
+let scanned = null;
+let formTags = [];
+let tagDraft = '';
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const esc = s => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function allTags() {
+  const s = new Set();
+  cards.forEach(c => (c.tags || []).forEach(t => s.add(t)));
+  return [...s].sort();
+}
+
+function filtered() {
+  let list = [...cards];
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    list = list.filter(c =>
+      [c.name, c.company, c.job_title, c.email, c.phone, c.website, c.notes, ...(c.tags||[])]
+        .filter(Boolean).some(v => String(v).toLowerCase().includes(q))
+    );
+  }
+  if (activeTag) list = list.filter(c => (c.tags||[]).includes(activeTag));
+  return list.sort((a,b) => a.name.localeCompare(b.name));
+}
+
+function render() {
+  document.getElementById('root').innerHTML = html();
+  bind();
+}
+
+function html() {
+  return header() + main() + fab() + bottomNav() + modalHtml();
+}
+
+function header() {
+  if (tab !== 'cards') {
+    const t = {export:'Export', settings:'Settings'}[tab] || tab;
+    return `<div class="header"><div class="header-top"><div class="app-title">${t}</div></div></div>`;
+  }
+  const tags = allTags();
+  return `
+    <div class="header">
+      <div class="header-top">
+        <div class="app-title">Business Cards</div>
+        <div class="card-count">${cards.length} card${cards.length!==1?'s':''}</div>
+      </div>
       <div class="search-wrap">
-        <span class="search-icon">&#128269;</span>
-        <input type="text" class="search-box" id="searchBox" placeholder="Search by name, story, or who introduced you...">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="si" type="search" placeholder="Search by name, company, email…" value="${esc(search)}">
       </div>
     </div>
+    ${tags.length ? `
+      <div class="tag-bar">
+        <button class="tag-btn${!activeTag?' active':''}" data-tag="">All</button>
+        ${tags.map(t=>`<button class="tag-btn${activeTag===t?' active':''}" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}
+      </div>` : ''}
+  `;
+}
 
-    <div class="info-bar">
-      <div class="stats" id="stats"></div>
-      <div class="data-actions">
-        <button class="btn-tiny" onclick="exportData()">&#128190; Save backup</button>
-        <button class="btn-tiny" onclick="document.getElementById('importFile').click()">&#128194; Load backup</button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-      </div>
-    </div>
+function main() {
+  if (tab === 'export') return exportTab();
+  if (tab === 'settings') return settingsTab();
+  return cardsTab();
+}
 
-    <div class="contacts" id="contactList"></div>
-  </div>
+function cardsTab() {
+  const list = filtered();
+  if (!list.length) return `
+    <div class="list">
+      <div class="empty">
+        <div class="empty-icon">🪪</div>
+        <div class="empty-title">No cards yet</div>
+        <div class="empty-sub">${search||activeTag ? 'No cards match your search.' : 'Tap the + button below to add your first card.'}</div>
+      </div>
+    </div>`;
+  return `<div class="list">${list.map(cardRow).join('')}</div>`;
+}
 
-  <!-- Add/Edit Contact Modal -->
-  <div class="modal-overlay" id="contactModal">
-    <div class="modal">
-      <h2 id="modalTitle">I just met someone!</h2>
-      <input type="hidden" id="editId">
-      <div class="form-group">
-        <label>What's their name?</label>
-        <input type="text" id="fieldName" placeholder="e.g. Sarah Chen">
-      </div>
-      <div class="form-group">
-        <label>When did you meet?</label>
-        <input type="date" id="fieldDate">
-      </div>
-      <div class="form-group">
-        <label>Who introduced you?</label>
-        <input type="text" id="fieldIntroducedBy" placeholder="e.g. My friend Alex, at a dinner party">
-        <div class="form-hint">Leave blank if you met on your own</div>
-      </div>
-      <div class="form-group">
-        <label>Their story</label>
-        <textarea id="fieldStory" placeholder="What do they do? Where are they from? What's interesting about them?"></textarea>
-      </div>
-      <div class="form-group">
-        <label>What did they say?</label>
-        <textarea id="fieldSaid" placeholder="Anything memorable they mentioned..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>Tags</label>
-        <input type="text" id="fieldTags" placeholder="e.g. designer, NYC, coffee lover">
-        <div class="form-hint">Separate with commas to help you find them later</div>
-      </div>
-      <div class="modal-actions">
-        <div>
-          <button class="btn btn-danger" id="deleteBtn" onclick="deleteContact()" style="display:none">Remove</button>
+function cardRow(c) {
+  const initial = (c.name||'?')[0].toUpperCase();
+  const sub = [c.job_title, c.company].filter(Boolean).join(' · ');
+  const tags = (c.tags||[]).slice(0,3).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+  const more = (c.tags||[]).length>3 ? `<span style="font-size:11px;color:var(--faint)">+${c.tags.length-3}</span>` : '';
+  return `
+    <div class="card-row" data-id="${esc(c.id)}">
+      <div class="avatar">${esc(initial)}</div>
+      <div class="card-body">
+        <div class="card-name">${esc(c.name)}</div>
+        ${sub ? `<div class="card-sub">${esc(sub)}</div>` : ''}
+        <div class="card-contact">
+          ${c.email ? `<div class="contact-row">✉️ ${esc(c.email)}</div>` : ''}
+          ${c.phone ? `<div class="contact-row">📞 ${esc(c.phone)}</div>` : ''}
         </div>
-        <div class="right">
-          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary" onclick="saveContact()">Save this person</button>
+        ${tags||more ? `<div class="tag-chips">${tags}${more}</div>` : ''}
+      </div>
+      <span class="chevron">›</span>
+    </div>`;
+}
+
+function exportTab() {
+  return `
+    <div class="exp-wrap">
+      <div class="exp-count">${cards.length} card${cards.length!==1?'s':''} ready to export</div>
+      <button class="exp-btn exp-csv" id="exp-csv">
+        <div class="exp-icon">📄</div>
+        <div class="exp-text">
+          <div class="exp-title">Export as CSV</div>
+          <div class="exp-desc">Opens in Excel, Numbers, or Google Sheets</div>
+        </div>›
+      </button>
+      <button class="exp-btn exp-vcf" id="exp-vcf">
+        <div class="exp-icon">👥</div>
+        <div class="exp-text">
+          <div class="exp-title">Export as vCard (.vcf)</div>
+          <div class="exp-desc">Import into iPhone Contacts, Outlook, or Gmail</div>
+        </div>›
+      </button>
+    </div>`;
+}
+
+function settingsTab() {
+  return `
+    <div class="set-wrap">
+      <div class="set-info">
+        To use <strong>AI card scanning</strong> (automatically read info from a photo), you need a free Anthropic API key.<br><br>
+        1. Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+        2. Sign up and create an API key<br>
+        3. Paste it below and tap Save<br><br>
+        Your key is saved only on this device and never sent anywhere except Anthropic.
+      </div>
+      <div class="set-lbl">Anthropic API Key</div>
+      <input class="f-input" id="api-key-input" type="password" placeholder="sk-ant-…" value="${esc(loadApiKey())}" style="margin-bottom:10px">
+      <button class="save-btn" id="save-key-btn" style="margin-top:0">💾 Save API Key</button>
+      <div class="set-saved" id="key-saved">✓ Saved!</div>
+    </div>`;
+}
+
+function fab() {
+  if (tab !== 'cards') return '';
+  return `
+    ${fabOpen ? '<div class="fab-backdrop" id="fab-bd"></div>' : ''}
+    ${fabOpen ? `
+      <div class="fab-actions">
+        <button class="fab-action" id="fab-scan">
+          <span class="fab-label">Scan card with camera</span>
+          <span class="fab-mini green">📷</span>
+        </button>
+        <button class="fab-action" id="fab-manual">
+          <span class="fab-label">Enter manually</span>
+          <span class="fab-mini">✏️</span>
+        </button>
+      </div>` : ''}
+    <button class="fab${fabOpen?' open':''}" id="fab">${fabOpen ? '✕' : '+'}</button>`;
+}
+
+function bottomNav() {
+  const tabs = [['cards','🪪','Cards'],['export','⬇️','Export'],['settings','⚙️','Settings']];
+  return `<nav class="bottom-nav">
+    ${tabs.map(([id,icon,lbl])=>`
+      <button class="nav-btn${tab===id?' active':''}" data-nav="${id}">
+        <span class="nav-icon">${icon}</span>${lbl}
+      </button>`).join('')}
+  </nav>`;
+}
+
+function modalHtml() {
+  if (modal === 'add' || modal === 'edit') return formModal();
+  if (modal === 'detail') return detailModal();
+  return '';
+}
+
+const FIELDS = [
+  {k:'name',      lbl:'Name',      icon:'👤', ph:'Full name',              req:true},
+  {k:'company',   lbl:'Company',   icon:'🏢', ph:'Company name'},
+  {k:'job_title', lbl:'Job Title', icon:'💼', ph:'e.g. Product Manager'},
+  {k:'email',     lbl:'Email',     icon:'✉️', ph:'email@example.com',     type:'email'},
+  {k:'phone',     lbl:'Phone',     icon:'📞', ph:'+1 (555) 000-0000',     type:'tel'},
+  {k:'website',   lbl:'Website',   icon:'🌐', ph:'https://example.com',   type:'url'},
+  {k:'address',   lbl:'Address',   icon:'📍', ph:'123 Main St, City',     multi:true},
+  {k:'notes',     lbl:'Notes',     icon:'📝', ph:'Any notes…',            multi:true},
+];
+
+function formModal() {
+  const seed = detailCard || scanned || {};
+  const isEdit = modal === 'edit';
+  return `
+    <div class="backdrop" id="bd">
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-title">${isEdit ? 'Edit Card' : 'Add Card'}</div>
+          <button class="close-btn" id="modal-x">✕</button>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Contact Detail View -->
-  <div class="detail-overlay" id="detailOverlay">
-    <div class="detail-panel" id="detailPanel"></div>
-  </div>
-
-  <!-- Add Encounter Modal -->
-  <div class="modal-overlay" id="encounterModal">
-    <div class="modal">
-      <h2>I saw them again!</h2>
-      <input type="hidden" id="encContactId">
-      <div class="form-group">
-        <label>When?</label>
-        <input type="date" id="encDate">
-      </div>
-      <div class="form-group">
-        <label>What happened?</label>
-        <textarea id="encNotes" placeholder="What did you talk about? What did they share? How was the meeting?" style="min-height:120px"></textarea>
-      </div>
-      <div class="modal-actions">
-        <div></div>
-        <div class="right">
-          <button class="btn btn-secondary" onclick="closeEncounterModal()">Cancel</button>
-          <button class="btn btn-primary" onclick="saveEncounter()">Save encounter</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Color palette for avatars
-    const COLORS = ['#e07850','#7c6bce','#5ba87a','#d4a843','#c75b8e','#5b8ec7','#8b6b4a','#6bae9e'];
-
-    function getColor(name) {
-      let hash = 0;
-      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-      return COLORS[Math.abs(hash) % COLORS.length];
-    }
-
-    function getInitials(name) {
-      return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-    }
-
-    // Data layer
-    function getContacts() {
-      return JSON.parse(localStorage.getItem('crm_contacts') || '[]');
-    }
-
-    function saveContacts(contacts) {
-      localStorage.setItem('crm_contacts', JSON.stringify(contacts));
-    }
-
-    function generateId() {
-      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    }
-
-    // Render
-    function render() {
-      const contacts = getContacts();
-      const query = document.getElementById('searchBox').value.toLowerCase();
-
-      const filtered = contacts.filter(c => {
-        if (!query) return true;
-        return (
-          c.name.toLowerCase().includes(query) ||
-          (c.story || '').toLowerCase().includes(query) ||
-          (c.introducedBy || '').toLowerCase().includes(query) ||
-          (c.said || '').toLowerCase().includes(query) ||
-          (c.tags || []).some(t => t.toLowerCase().includes(query))
-        );
-      });
-
-      filtered.sort((a, b) => new Date(b.dateMet || b.createdAt) - new Date(a.dateMet || a.createdAt));
-
-      const list = document.getElementById('contactList');
-      const stats = document.getElementById('stats');
-
-      stats.textContent = `${contacts.length} person${contacts.length !== 1 ? 's' : ''} remembered${query ? ` \u00b7 ${filtered.length} found` : ''}`;
-
-      if (filtered.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="illustration">${query ? '\ud83d\udd0d' : '\ud83e\udd1d'}</div>
-            <h2>${query ? 'Nobody matches that search' : 'Your people list is empty'}</h2>
-            <p>${query ? 'Try different words or check the spelling' : 'Tap the button above next time you meet someone interesting!'}</p>
-          </div>
-        `;
-        return;
-      }
-
-      list.innerHTML = filtered.map(c => {
-        const encounterCount = (c.encounters || []).length;
-        const color = getColor(c.name);
-        return `
-          <div class="contact-card" onclick="openDetail('${c.id}')">
-            <div class="card-top">
-              <div class="avatar" style="background:${color}">${getInitials(c.name)}</div>
-              <div class="card-info">
-                <div class="card-name">${escapeHtml(c.name)}</div>
-                <div class="card-meta">
-                  ${c.dateMet ? `<span>\ud83d\udcc5 ${formatDate(c.dateMet)}</span>` : ''}
-                  ${c.introducedBy ? `<span>\ud83d\udc64 Via ${escapeHtml(c.introducedBy)}</span>` : ''}
-                  ${encounterCount ? `<span>\ud83d\udd04 ${encounterCount} encounter${encounterCount > 1 ? 's' : ''}</span>` : ''}
-                </div>
+        <div class="modal-body">
+          ${scanned && !isEdit ? `<div class="scan-banner">✨ Fields filled from scan — please review and correct anything before saving.</div>` : ''}
+          ${FIELDS.map(f => `
+            <div class="field">
+              <div class="f-label"><span class="fi">${f.icon}</span>${f.lbl}${f.req?`<span class="req"> *</span>`:''}
               </div>
+              ${f.multi
+                ? `<textarea class="f-input" id="f-${f.k}" placeholder="${f.ph}">${esc(seed[f.k]||'')}</textarea>`
+                : `<input class="f-input" id="f-${f.k}" type="${f.type||'text'}" placeholder="${f.ph}" value="${esc(seed[f.k]||'')}">`}
+              ${f.req ? `<div class="err-msg" id="err-${f.k}">Name is required.</div>` : ''}
+            </div>`).join('')}
+
+          <div class="field">
+            <div class="f-label"><span class="fi">🏷️</span>Tags</div>
+            <div class="form-chips" id="fc">
+              ${formTags.map((t,i)=>`<span class="form-chip">${esc(t)}<button class="chip-x" data-ti="${i}">✕</button></span>`).join('')}
             </div>
-            ${c.story ? `<div class="card-story">${escapeHtml(c.story)}</div>` : ''}
-            ${c.tags && c.tags.length ? `
-              <div class="card-tags">${c.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
-            ` : ''}
+            <div class="tag-row">
+              <input class="tag-inp" id="tag-inp" placeholder="Add a tag…" value="${esc(tagDraft)}">
+              <button class="tag-add" id="tag-add-btn">Add</button>
+            </div>
           </div>
-        `;
-      }).join('');
-    }
 
-    // Modal: Add/Edit
-    function openAddModal() {
-      document.getElementById('modalTitle').textContent = 'I just met someone!';
-      document.getElementById('editId').value = '';
-      document.getElementById('fieldName').value = '';
-      document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('fieldIntroducedBy').value = '';
-      document.getElementById('fieldStory').value = '';
-      document.getElementById('fieldSaid').value = '';
-      document.getElementById('fieldTags').value = '';
-      document.getElementById('deleteBtn').style.display = 'none';
-      document.getElementById('contactModal').classList.add('active');
-      setTimeout(() => document.getElementById('fieldName').focus(), 100);
-    }
+          <button class="save-btn" id="save-btn">${isEdit ? '✓ Save Changes' : '＋ Add Card'}</button>
+        </div>
+      </div>
+    </div>`;
+}
 
-    function openEditModal(id) {
-      const contacts = getContacts();
-      const c = contacts.find(x => x.id === id);
-      if (!c) return;
-
-      document.getElementById('modalTitle').textContent = 'Edit this person';
-      document.getElementById('editId').value = c.id;
-      document.getElementById('fieldName').value = c.name;
-      document.getElementById('fieldDate').value = c.dateMet || '';
-      document.getElementById('fieldIntroducedBy').value = c.introducedBy || '';
-      document.getElementById('fieldStory').value = c.story || '';
-      document.getElementById('fieldSaid').value = c.said || '';
-      document.getElementById('fieldTags').value = (c.tags || []).join(', ');
-      document.getElementById('deleteBtn').style.display = 'inline-flex';
-      document.getElementById('contactModal').classList.add('active');
-      closeDetail();
-    }
-
-    function closeModal() {
-      document.getElementById('contactModal').classList.remove('active');
-    }
-
-    function saveContact() {
-      const name = document.getElementById('fieldName').value.trim();
-      if (!name) {
-        document.getElementById('fieldName').style.borderColor = 'var(--danger)';
-        document.getElementById('fieldName').focus();
-        return;
-      }
-
-      const contacts = getContacts();
-      const editId = document.getElementById('editId').value;
-      const tagsRaw = document.getElementById('fieldTags').value;
-      const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
-
-      if (editId) {
-        const idx = contacts.findIndex(c => c.id === editId);
-        if (idx !== -1) {
-          contacts[idx].name = name;
-          contacts[idx].dateMet = document.getElementById('fieldDate').value;
-          contacts[idx].introducedBy = document.getElementById('fieldIntroducedBy').value.trim();
-          contacts[idx].story = document.getElementById('fieldStory').value.trim();
-          contacts[idx].said = document.getElementById('fieldSaid').value.trim();
-          contacts[idx].tags = tags;
-          contacts[idx].updatedAt = new Date().toISOString();
-        }
-      } else {
-        contacts.push({
-          id: generateId(),
-          name,
-          dateMet: document.getElementById('fieldDate').value,
-          introducedBy: document.getElementById('fieldIntroducedBy').value.trim(),
-          story: document.getElementById('fieldStory').value.trim(),
-          said: document.getElementById('fieldSaid').value.trim(),
-          tags,
-          encounters: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-      }
-
-      saveContacts(contacts);
-      closeModal();
-      render();
-    }
-
-    function deleteContact() {
-      const editId = document.getElementById('editId').value;
-      if (!editId) return;
-      if (!confirm('Are you sure you want to remove this person?')) return;
-
-      const contacts = getContacts().filter(c => c.id !== editId);
-      saveContacts(contacts);
-      closeModal();
-      render();
-    }
-
-    // Detail view
-    function openDetail(id) {
-      const contacts = getContacts();
-      const c = contacts.find(x => x.id === id);
-      if (!c) return;
-
-      const encounters = (c.encounters || []).sort((a, b) => new Date(b.date) - new Date(a.date));
-      const color = getColor(c.name);
-
-      document.getElementById('detailPanel').innerHTML = `
-        <div class="detail-header">
-          <div class="detail-avatar" style="background:${color}">${getInitials(c.name)}</div>
-          <div>
-            <h2>${escapeHtml(c.name)}</h2>
-            ${c.dateMet ? `<div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.15rem">\ud83d\udcc5 Met ${formatDate(c.dateMet)}</div>` : ''}
+function detailModal() {
+  if (!detailCard) return '';
+  const c = detailCard;
+  const rows = [
+    {lbl:'Company',   icon:'🏢', val:c.company},
+    {lbl:'Job Title', icon:'💼', val:c.job_title},
+    {lbl:'Email',     icon:'✉️', val:c.email,   href: c.email   ? `mailto:${c.email}`   : null},
+    {lbl:'Phone',     icon:'📞', val:c.phone,   href: c.phone   ? `tel:${c.phone}`     : null},
+    {lbl:'Website',   icon:'🌐', val:c.website, href: c.website},
+    {lbl:'Address',   icon:'📍', val:c.address},
+    {lbl:'Notes',     icon:'📝', val:c.notes},
+  ].filter(r => r.val);
+  const tags = (c.tags||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+  return `
+    <div class="backdrop" id="bd">
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-title">${esc(c.name)}</div>
+          <button class="close-btn" id="modal-x">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-actions">
+            <button class="det-btn det-edit" id="det-edit">✏️ Edit</button>
+            <button class="det-btn det-del" id="det-del">🗑 Delete</button>
           </div>
-        </div>
-
-        ${c.tags && c.tags.length ? `
-          <div class="detail-tags">${c.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
-        ` : ''}
-
-        <div class="detail-field">
-          <div class="label">Introduced by</div>
-          <div class="value ${!c.introducedBy ? 'empty' : ''}">${c.introducedBy ? escapeHtml(c.introducedBy) : 'Not recorded'}</div>
-        </div>
-        <div class="detail-field">
-          <div class="label">Their story</div>
-          <div class="value ${!c.story ? 'empty' : ''}">${c.story ? escapeHtml(c.story) : 'Not recorded'}</div>
-        </div>
-        <div class="detail-field">
-          <div class="label">What they said</div>
-          <div class="value ${!c.said ? 'empty' : ''}">${c.said ? escapeHtml(c.said) : 'Not recorded'}</div>
-        </div>
-
-        <div class="encounters-section">
-          <div class="encounters-header">
-            <h3>\ud83d\udcc6 Encounters (${encounters.length})</h3>
-            <button class="btn btn-primary btn-sm" onclick="openEncounterModal('${c.id}')">+ I saw them again</button>
-          </div>
-          ${encounters.length === 0
-            ? '<p class="no-encounters">No follow-up encounters yet. Tap the button above when you see them again!</p>'
-            : encounters.map(e => `
-              <div class="encounter-item">
-                <div class="encounter-date">${formatDate(e.date)}</div>
-                <div class="encounter-said">${escapeHtml(e.notes)}</div>
+          ${rows.map(r=>`
+            <div class="det-field">
+              <div class="det-icon">${r.icon}</div>
+              <div class="det-content">
+                <div class="det-lbl">${r.lbl}</div>
+                <div class="det-val">${r.href ? `<a href="${esc(r.href)}">${esc(r.val)}</a>` : esc(r.val)}</div>
               </div>
-            `).join('')
-          }
+            </div>`).join('')}
+          ${tags ? `
+            <div class="det-field">
+              <div class="det-icon">🏷️</div>
+              <div class="det-content">
+                <div class="det-lbl">Tags</div>
+                <div class="tag-chips" style="margin-top:4px">${tags}</div>
+              </div>
+            </div>` : ''}
         </div>
+      </div>
+    </div>`;
+}
 
-        <div class="detail-actions">
-          <button class="btn btn-secondary btn-sm" onclick="openEditModal('${c.id}')">Edit</button>
-          <button class="btn btn-secondary btn-sm" onclick="closeDetail()">Close</button>
-        </div>
-      `;
-
-      document.getElementById('detailOverlay').classList.add('active');
-    }
-
-    function closeDetail() {
-      document.getElementById('detailOverlay').classList.remove('active');
-    }
-
-    // Encounters
-    function openEncounterModal(contactId) {
-      document.getElementById('encContactId').value = contactId;
-      document.getElementById('encDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('encNotes').value = '';
-      document.getElementById('encounterModal').classList.add('active');
-      closeDetail();
-      setTimeout(() => document.getElementById('encNotes').focus(), 100);
-    }
-
-    function closeEncounterModal() {
-      document.getElementById('encounterModal').classList.remove('active');
-    }
-
-    function saveEncounter() {
-      const contactId = document.getElementById('encContactId').value;
-      const notes = document.getElementById('encNotes').value.trim();
-      if (!notes) { document.getElementById('encNotes').focus(); return; }
-
-      const contacts = getContacts();
-      const c = contacts.find(x => x.id === contactId);
-      if (!c) return;
-
-      if (!c.encounters) c.encounters = [];
-      c.encounters.push({
-        id: generateId(),
-        date: document.getElementById('encDate').value,
-        notes,
-      });
-      c.updatedAt = new Date().toISOString();
-
-      saveContacts(contacts);
-      closeEncounterModal();
-      openDetail(contactId);
+function bind() {
+  document.querySelectorAll('[data-nav]').forEach(b =>
+    b.addEventListener('click', () => { tab = b.dataset.nav; fabOpen = false; render(); })
+  );
+  const si = document.getElementById('si');
+  if (si) si.addEventListener('input', e => { search = e.target.value; render(); });
+  document.querySelectorAll('[data-tag]').forEach(b =>
+    b.addEventListener('click', () => {
+      const t = b.dataset.tag;
+      activeTag = t === '' ? null : (activeTag === t ? null : t);
       render();
-    }
-
-    // Export / Import
-    function exportData() {
-      const data = JSON.stringify(getContacts(), null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `my-people-backup-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importData(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (!Array.isArray(imported)) throw new Error('Invalid');
-
-          const existing = getContacts();
-          const existingIds = new Set(existing.map(c => c.id));
-          let added = 0;
-
-          for (const c of imported) {
-            if (!c.id || !c.name) continue;
-            if (existingIds.has(c.id)) continue;
-            existing.push(c);
-            added++;
-          }
-
-          saveContacts(existing);
-          render();
-          alert(`Welcome back! Loaded ${added} new person(s). ${imported.length - added} were already here.`);
-        } catch {
-          alert('Hmm, that file doesn\u2019t look right. Please use a backup file from this app.');
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    // Helpers
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    function formatDate(dateStr) {
-      if (!dateStr) return '';
-      const d = new Date(dateStr + 'T00:00:00');
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
-    // Close modals on backdrop click
-    document.getElementById('contactModal').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
-    document.getElementById('detailOverlay').addEventListener('click', function(e) {
-      if (e.target === this) closeDetail();
-    });
-    document.getElementById('encounterModal').addEventListener('click', function(e) {
-      if (e.target === this) closeEncounterModal();
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeModal();
-        closeDetail();
-        closeEncounterModal();
-      }
-    });
-
-    // Reset border color on input focus
-    document.getElementById('fieldName').addEventListener('focus', function() {
-      this.style.borderColor = '';
-    });
-
-    document.getElementById('searchBox').addEventListener('input', render);
-
+    })
+  );
+  document.querySelectorAll('[data-id]').forEach(el =>
+    el.addEventListener('click', () => {
+      detailCard = cards.find(c => c.id === el.dataset.id) || null;
+      if (detailCard) { modal = 'detail'; render(); }
+    })
+  );
+  q('fab', () => { fabOpen = !fabOpen; render(); });
+  q('fab-bd', () => { fabOpen = false; render(); });
+  q('fab-scan', () => { fabOpen = false; render(); document.getElementById('photo-input').click(); });
+  q('fab-manual', () => { fabOpen = false; openAdd(); });
+  const bd = document.getElementById('bd');
+  if (bd) bd.addEventListener('click', e => { if (e.target === bd) closeModal(); });
+  q('modal-x', closeModal);
+  q('save-btn', handleSave);
+  const ti = document.getElementById('tag-inp');
+  if (ti) {
+    ti.addEventListener('input', e => { tagDraft = e.target.value; });
+    ti.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
+  }
+  q('tag-add-btn', addTag);
+  document.querySelectorAll('[data-ti]').forEach(b =>
+    b.addEventListener('click', () => { formTags.splice(+b.dataset.ti, 1); render(); })
+  );
+  q('det-edit', () => {
+    formTags = [...(detailCard.tags || [])];
+    scanned = null;
+    modal = 'edit';
     render();
-  </script>
+  });
+  q('det-del', () => {
+    if (confirm(`Delete "${detailCard.name}"? This cannot be undone.`)) {
+      cards = cards.filter(c => c.id !== detailCard.id);
+      saveCards(cards);
+      closeModal();
+    }
+  });
+  q('exp-csv',  exportCSV);
+  q('exp-vcf',  exportVCard);
+  q('save-key-btn', () => {
+    const k = document.getElementById('api-key-input')?.value.trim() || '';
+    saveApiKey(k);
+    const el = document.getElementById('key-saved');
+    if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2000); }
+  });
+  document.getElementById('photo-input').addEventListener('change', onPhoto);
+}
+
+function q(id, fn) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', fn);
+}
+
+function openAdd() {
+  detailCard = null; scanned = null; formTags = []; tagDraft = '';
+  modal = 'add'; render();
+}
+
+function closeModal() {
+  modal = null; detailCard = null; scanned = null; formTags = []; tagDraft = '';
+  render();
+}
+
+function getFormData() {
+  const v = id => document.getElementById('f-' + id)?.value.trim() || null;
+  return {
+    name: v('name'), company: v('company'), job_title: v('job_title'),
+    email: v('email'), phone: v('phone'), website: v('website'),
+    address: v('address'), notes: v('notes'), tags: [...formTags],
+  };
+}
+
+function handleSave() {
+  const data = getFormData();
+  if (!data.name) {
+    document.getElementById('f-name')?.classList.add('err');
+    const em = document.getElementById('err-name');
+    if (em) em.classList.add('show');
+    return;
+  }
+  if (modal === 'edit' && detailCard) {
+    const idx = cards.findIndex(c => c.id === detailCard.id);
+    if (idx >= 0) cards[idx] = { ...detailCard, ...data, updated_at: new Date().toISOString() };
+  } else {
+    cards.push({ id: uid(), ...data, created_at: new Date().toISOString() });
+  }
+  saveCards(cards);
+  closeModal();
+}
+
+function addTag() {
+  const val = (tagDraft || document.getElementById('tag-inp')?.value || '').trim();
+  if (!val || formTags.includes(val)) { tagDraft = ''; render(); return; }
+  formTags.push(val);
+  tagDraft = '';
+  render();
+}
+
+async function onPhoto(e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  const apiKey = loadApiKey();
+  if (!apiKey) {
+    alert('To use AI scanning, please add your Anthropic API key in the Settings tab first.');
+    tab = 'settings'; render(); return;
+  }
+  document.getElementById('scan-overlay').classList.add('show');
+  try {
+    const b64 = await toBase64(file);
+    const mt  = file.type || 'image/jpeg';
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-7',
+        max_tokens: 512,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mt, data: b64 } },
+            { type: 'text',  text:  'Extract all contact information from this business card. Return ONLY a JSON object:\n{"name":null,"company":null,"job_title":null,"email":null,"phone":null,"website":null,"address":null}\nUse null for any field not present.' },
+          ],
+        }],
+      }),
+    });
+    document.getElementById('scan-overlay').classList.remove('show');
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({}));
+      throw new Error(err.error?.message || 'API error ' + resp.status);
+    }
+    const result = await resp.json();
+    const text   = result.content[0].text.trim();
+    const match  = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Could not read data from image');
+    scanned    = JSON.parse(match[0]);
+    detailCard = null;
+    formTags   = [];
+    tagDraft   = '';
+    modal      = 'add';
+    render();
+  } catch (err) {
+    document.getElementById('scan-overlay').classList.remove('show');
+    alert('Scan failed: ' + err.message + '\n\nCheck that your API key is correct in Settings.');
+  }
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function dl(content, name, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type}));
+  a.download = name;
+  a.click();
+}
+
+function exportCSV() {
+  const e = v => { if (!v && v!==0) return ''; const s=String(v); return (s.includes(',')||s.includes('"')||s.includes('\n')) ? `"${s.replace(/"/g,'""')}"` : s; };
+  const hdr = ['Name','Company','Job Title','Email','Phone','Website','Address','Notes','Tags'].join(',');
+  const rows = cards.map(c => [c.name,c.company,c.job_title,c.email,c.phone,c.website,c.address,c.notes,(c.tags||[]).join('; ')].map(e).join(','));
+  dl([hdr,...rows].join('\r\n'), 'business-cards.csv', 'text/csv');
+}
+
+function exportVCard() {
+  const e = v => v ? String(v).replace(/\\/g,'\\\\').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n') : '';
+  const vcards = cards.map(c => {
+    const parts = (c.name||'').trim().split(/\s+/);
+    const last  = parts.length > 1 ? parts[parts.length-1] : '';
+    const first = parts.length > 1 ? parts.slice(0,-1).join(' ') : parts[0];
+    const lines = ['BEGIN:VCARD','VERSION:3.0',`FN:${e(c.name)}`,`N:${e(last)};${e(first)};;;`];
+    if (c.company)   lines.push(`ORG:${e(c.company)}`);
+    if (c.job_title) lines.push(`TITLE:${e(c.job_title)}`);
+    if (c.email)     lines.push(`EMAIL;TYPE=INTERNET:${e(c.email)}`);
+    if (c.phone)     lines.push(`TEL;TYPE=WORK,VOICE:${e(c.phone)}`);
+    if (c.website)   lines.push(`URL:${e(c.website)}`);
+    if (c.address)   lines.push(`ADR;TYPE=WORK:;;${e(c.address)};;;;`);
+    if (c.notes)     lines.push(`NOTE:${e(c.notes)}`);
+    if ((c.tags||[]).length) lines.push(`CATEGORIES:${c.tags.map(e).join(',')}`);
+    lines.push('END:VCARD');
+    return lines.join('\r\n');
+  });
+  dl(vcards.join('\r\n\r\n'), 'business-cards.vcf', 'text/vcard');
+}
+
+render();
+</script>
 </body>
 </html>
