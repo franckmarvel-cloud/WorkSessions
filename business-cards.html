@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Business Cards</title>
+  <style>
+    :root {
+      --accent: #4F46E5;
+      --accent-light: #EEF2FF;
+      --green: #059669;
+      --green-light: #D1FAE5;
+      --bg: #F9FAFB;
+      --surface: #ffffff;
+      --border: #E5E7EB;
+      --text: #111827;
+      --muted: #6B7280;
+      --faint: #9CA3AF;
+      --danger: #EF4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── Header ── */
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 16px 12px; position: sticky; top: 0; z-index: 100; }
+    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .app-title { font-size: 20px; font-weight: 800; }
+    .card-count { font-size: 13px; color: var(--muted); }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+    .search-input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; color: var(--text); background: var(--bg); outline: none; font-family: inherit; }
+    .search-input:focus { border-color: var(--accent); }
+
+    /* ── Tag filters ── */
+    .tag-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; scrollbar-width: none; }
+    .tag-bar::-webkit-scrollbar { display: none; }
+    .tag-btn { padding: 5px 14px; border-radius: 20px; border: none; background: var(--border); color: #374151; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all .15s; }
+    .tag-btn.active { background: var(--accent); color: #fff; }
+
+    /* ── Cards list ── */
+    .list { padding: 8px 16px 120px; }
+    .card-row { background: var(--surface); border-radius: 12px; padding: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: box-shadow .15s; }
+    .card-row:hover { box-shadow: 0 3px 8px rgba(0,0,0,.1); }
+    .avatar { width: 44px; height: 44px; border-radius: 22px; background: var(--accent); color: #fff; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .card-body { flex: 1; min-width: 0; }
+    .card-name { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-sub { font-size: 13px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-contact { margin-top: 3px; }
+    .contact-row { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--faint); }
+    .tag-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .chip { background: var(--accent-light); color: var(--accent); border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+    .chevron { color: var(--border); flex-shrink: 0; font-size: 20px; }
+
+    /* ── Empty state ── */
+    .empty { display: flex; flex-direction: column; align-items: center; padding: 60px 32px; text-align: center; }
+    .empty-icon { font-size: 60px; opacity: .25; margin-bottom: 14px; }
+    .empty-title { font-size: 20px; font-weight: 700; color: #374151; margin-bottom: 8px; }
+    .empty-sub { font-size: 14px; color: var(--faint); line-height: 1.5; }
+
+    /* ── FAB ── */
+    .fab { position: fixed; bottom: 76px; right: 20px; width: 56px; height: 56px; border-radius: 28px; background: var(--accent); color: #fff; border: none; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(79,70,229,.45); z-index: 200; transition: all .2s; }
+    .fab.open { background: #374151; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+    .fab-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 190; }
+    .fab-actions { position: fixed; bottom: 144px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; z-index: 200; }
+    .fab-action { display: flex; align-items: center; gap: 10px; border: none; background: none; cursor: pointer; padding: 0; }
+    .fab-label { background: #1F2937; color: #fff; border-radius: 8px; padding: 5px 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .fab-mini { width: 46px; height: 46px; border-radius: 23px; background: var(--accent); color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(79,70,229,.35); }
+    .fab-mini.green { background: var(--green); box-shadow: 0 3px 8px rgba(5,150,105,.35); }
+
+    /* ── Bottom nav ── */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 4px 10px; border: none; background: none; cursor: pointer; color: var(--faint); font-size: 11px; font-weight: 600; gap: 2px; }
+    .nav-btn.active { color: var(--accent); }
+    .nav-icon { font-size: 20px; }
+
+    /* ── Modal ── */
+    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+    .modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto; animation: slideUp .25s ease-out; }
+    @media(min-width:600px) { .backdrop { align-items: center; } .modal { border-radius: 20px; max-height: 85vh; } }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 18px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 1; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .close-btn { width: 30px; height: 30px; border-radius: 15px; border: none; background: var(--bg); color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-body { padding: 18px; }
+
+    /* ── Form ── */
+    .field { margin-bottom: 14px; }
+    .f-label { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px; }
+    .f-label .fi { color: var(--accent); }
+    .req { color: var(--danger); }
+    .f-input { width: 100%; padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; color: var(--text); background: var(--surface); outline: none; font-family: inherit; transition: border-color .15s; }
+    .f-input:focus { border-color: var(--accent); }
+    .f-input.err { border-color: var(--danger); }
+    textarea.f-input { min-height: 76px; resize: vertical; }
+    .err-msg { font-size: 12px; color: var(--danger); margin-top: 3px; display: none; }
+    .err-msg.show { display: block; }
+
+    /* Tags in form */
+    .form-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+    .form-chip { display: flex; align-items: center; gap: 4px; background: var(--accent-light); color: var(--accent); border-radius: 20px; padding: 4px 8px 4px 10px; font-size: 13px; font-weight: 600; }
+    .chip-x { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; line-height: 1; padding: 0; }
+    .tag-row { display: flex; gap: 8px; }
+    .tag-inp { flex: 1; padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; color: var(--text); outline: none; font-family: inherit; }
+    .tag-inp:focus { border-color: var(--accent); }
+    .tag-add { padding: 10px 15px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .tag-add:disabled { background: #C7D2FE; cursor: default; }
+
+    .scan-banner { display: flex; align-items: flex-start; gap: 8px; background: var(--green-light); border-radius: 10px; padding: 11px; margin-bottom: 14px; font-size: 13px; color: #065F46; font-weight: 500; line-height: 1.5; }
+
+    .save-btn { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 6px; box-shadow: 0 4px 12px rgba(79,70,229,.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .save-btn:disabled { opacity: .65; cursor: default; }
+
+    /* ── Detail view ── */
+    .detail-actions { display: flex; gap: 8px; margin-bottom: 18px; }
+    .det-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .det-edit { background: var(--accent-light); color: var(--accent); }
+    .det-del { background: #FEE2E2; color: var(--danger); }
+    .det-field { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .det-field:last-child { border-bottom: none; }
+    .det-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .det-content { flex: 1; }
+    .det-lbl { font-size: 11px; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+    .det-val { font-size: 15px; color: var(--text); word-break: break-word; }
+    .det-val a { color: var(--accent); text-decoration: none; }
+
+    /* ── Export tab ── */
+    .exp-wrap { padding: 20px 16px 90px; }
+    .exp-count { text-align: center; color: var(--muted); margin-bottom: 22px; font-size: 15px; }
+    .exp-btn { width: 100%; padding: 18px; border-radius: 16px; border: none; margin-bottom: 13px; cursor: pointer; display: flex; align-items: center; gap: 14px; text-align: left; }
+    .exp-btn:hover { opacity: .92; }
+    .exp-csv { background: var(--accent); color: #fff; }
+    .exp-vcf { background: var(--green); color: #fff; }
+    .exp-icon { width: 50px; height: 50px; border-radius: 25px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .exp-text { flex: 1; }
+    .exp-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+    .exp-desc { font-size: 12px; opacity: .85; line-height: 1.4; }
+
+    /* ── Settings tab ── */
+    .set-wrap { padding: 20px 16px 90px; }
+    .set-info { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 20px; background: var(--surface); border-radius: 12px; padding: 14px; }
+    .set-info a { color: var(--accent); }
+    .set-lbl { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .set-saved { text-align: center; margin-top: 10px; color: var(--green); font-weight: 600; font-size: 14px; display: none; }
+    .set-saved.show { display: block; }
+
+    /* ── Scan overlay ── */
+    .scan-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 500; display: none; align-items: center; justify-content: center; }
+    .scan-overlay.show { display: flex; }
+    .scan-box { background: #fff; border-radius: 16px; padding: 28px; text-align: center; width: 200px; }
+    .spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+    .scan-lbl { font-size: 15px; font-weight: 600; color: #374151; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div id="root"></div>
+<input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none">
+
+<div class="scan-overlay" id="scan-overlay">
+  <div class="scan-box">
+    <div class="spinner"></div>
+    <div class="scan-lbl">Reading card with AI…</div>
+  </div>
+</div>
+
+<script>
+// ── Storage ──────────────────────────────────────────────────────────────────
+const CARDS_KEY = 'biz_cards_v1';
+const APIKEY_KEY = 'biz_anthropic_key';
+
+function loadCards() {
+  try { return JSON.parse(localStorage.getItem(CARDS_KEY) || '[]'); } catch { return []; }
+}
+function saveCards(c) { localStorage.setItem(CARDS_KEY, JSON.stringify(c)); }
+function loadApiKey() { return localStorage.getItem(APIKEY_KEY) || ''; }
+function saveApiKey(k) { localStorage.setItem(APIKEY_KEY, k); }
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let cards = loadCards();
+let tab = 'cards';
+let search = '';
+let activeTag = null;
+let fabOpen = false;
+let modal = null;       // null | 'add' | 'edit' | 'detail'
+let detailCard = null;
+let scanned = null;
+let formTags = [];
+let tagDraft = '';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const esc = s => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function allTags() {
+  const s = new Set();
+  cards.forEach(c => (c.tags || []).forEach(t => s.add(t)));
+  return [...s].sort();
+}
+
+function filtered() {
+  let list = [...cards];
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    list = list.filter(c =>
+      [c.name, c.company, c.job_title, c.email, c.phone, c.website, c.notes, ...(c.tags||[])]
+        .filter(Boolean).some(v => String(v).toLowerCase().includes(q))
+    );
+  }
+  if (activeTag) list = list.filter(c => (c.tags||[]).includes(activeTag));
+  return list.sort((a,b) => a.name.localeCompare(b.name));
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  document.getElementById('root').innerHTML = html();
+  bind();
+}
+
+function html() {
+  return header() + main() + fab() + bottomNav() + modalHtml() ;
+}
+
+function header() {
+  if (tab !== 'cards') {
+    const t = {export:'Export', settings:'Settings'}[tab] || tab;
+    return `<div class="header"><div class="header-top"><div class="app-title">${t}</div></div></div>`;
+  }
+  const tags = allTags();
+  return `
+    <div class="header">
+      <div class="header-top">
+        <div class="app-title">Business Cards</div>
+        <div class="card-count">${cards.length} card${cards.length!==1?'s':''}</div>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="si" type="search" placeholder="Search by name, company, email…" value="${esc(search)}">
+      </div>
+    </div>
+    ${tags.length ? `
+      <div class="tag-bar">
+        <button class="tag-btn${!activeTag?' active':''}" data-tag="">All</button>
+        ${tags.map(t=>`<button class="tag-btn${activeTag===t?' active':''}" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}
+      </div>` : ''}
+  `;
+}
+
+function main() {
+  if (tab === 'export') return exportTab();
+  if (tab === 'settings') return settingsTab();
+  return cardsTab();
+}
+
+function cardsTab() {
+  const list = filtered();
+  if (!list.length) return `
+    <div class="list">
+      <div class="empty">
+        <div class="empty-icon">🪪</div>
+        <div class="empty-title">No cards yet</div>
+        <div class="empty-sub">${search||activeTag ? 'No cards match your search.' : 'Tap the + button below to add your first card.'}</div>
+      </div>
+    </div>`;
+  return `<div class="list">${list.map(cardRow).join('')}</div>`;
+}
+
+function cardRow(c) {
+  const initial = (c.name||'?')[0].toUpperCase();
+  const sub = [c.job_title, c.company].filter(Boolean).join(' · ');
+  const tags = (c.tags||[]).slice(0,3).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+  const more = (c.tags||[]).length>3 ? `<span style="font-size:11px;color:var(--faint)">+${c.tags.length-3}</span>` : '';
+  return `
+    <div class="card-row" data-id="${esc(c.id)}">
+      <div class="avatar">${esc(initial)}</div>
+      <div class="card-body">
+        <div class="card-name">${esc(c.name)}</div>
+        ${sub ? `<div class="card-sub">${esc(sub)}</div>` : ''}
+        <div class="card-contact">
+          ${c.email ? `<div class="contact-row">✉️ ${esc(c.email)}</div>` : ''}
+          ${c.phone ? `<div class="contact-row">📞 ${esc(c.phone)}</div>` : ''}
+        </div>
+        ${tags||more ? `<div class="tag-chips">${tags}${more}</div>` : ''}
+      </div>
+      <span class="chevron">›</span>
+    </div>`;
+}
+
+function exportTab() {
+  return `
+    <div class="exp-wrap">
+      <div class="exp-count">${cards.length} card${cards.length!==1?'s':''} ready to export</div>
+      <button class="exp-btn exp-csv" id="exp-csv">
+        <div class="exp-icon">📄</div>
+        <div class="exp-text">
+          <div class="exp-title">Export as CSV</div>
+          <div class="exp-desc">Opens in Excel, Numbers, or Google Sheets</div>
+        </div>›
+      </button>
+      <button class="exp-btn exp-vcf" id="exp-vcf">
+        <div class="exp-icon">👥</div>
+        <div class="exp-text">
+          <div class="exp-title">Export as vCard (.vcf)</div>
+          <div class="exp-desc">Import into iPhone Contacts, Outlook, or Gmail</div>
+        </div>›
+      </button>
+    </div>`;
+}
+
+function settingsTab() {
+  return `
+    <div class="set-wrap">
+      <div class="set-info">
+        To use <strong>AI card scanning</strong> (automatically read info from a photo), you need a free Anthropic API key.<br><br>
+        1. Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+        2. Sign up and create an API key<br>
+        3. Paste it below and tap Save<br><br>
+        Your key is saved only on this device and never sent anywhere except Anthropic.
+      </div>
+      <div class="set-lbl">Anthropic API Key</div>
+      <input class="f-input" id="api-key-input" type="password" placeholder="sk-ant-…" value="${esc(loadApiKey())}" style="margin-bottom:10px">
+      <button class="save-btn" id="save-key-btn" style="margin-top:0">💾 Save API Key</button>
+      <div class="set-saved" id="key-saved">✓ Saved!</div>
+    </div>`;
+}
+
+function fab() {
+  if (tab !== 'cards') return '';
+  return `
+    ${fabOpen ? '<div class="fab-backdrop" id="fab-bd"></div>' : ''}
+    ${fabOpen ? `
+      <div class="fab-actions">
+        <button class="fab-action" id="fab-scan">
+          <span class="fab-label">Scan card with camera</span>
+          <span class="fab-mini green">📷</span>
+        </button>
+        <button class="fab-action" id="fab-manual">
+          <span class="fab-label">Enter manually</span>
+          <span class="fab-mini">✏️</span>
+        </button>
+      </div>` : ''}
+    <button class="fab${fabOpen?' open':''}" id="fab">${fabOpen ? '✕' : '+'}</button>`;
+}
+
+function bottomNav() {
+  const tabs = [['cards','🪪','Cards'],['export','⬇️','Export'],['settings','⚙️','Settings']];
+  return `<nav class="bottom-nav">
+    ${tabs.map(([id,icon,lbl])=>`
+      <button class="nav-btn${tab===id?' active':''}" data-nav="${id}">
+        <span class="nav-icon">${icon}</span>${lbl}
+      </button>`).join('')}
+  </nav>`;
+}
+
+// ── Modals ────────────────────────────────────────────────────────────────────
+function modalHtml() {
+  if (modal === 'add' || modal === 'edit') return formModal();
+  if (modal === 'detail') return detailModal();
+  return '';
+}
+
+const FIELDS = [
+  {k:'name',      lbl:'Name',      icon:'👤', ph:'Full name',              req:true},
+  {k:'company',   lbl:'Company',   icon:'🏢', ph:'Company name'},
+  {k:'job_title', lbl:'Job Title', icon:'💼', ph:'e.g. Product Manager'},
+  {k:'email',     lbl:'Email',     icon:'✉️', ph:'email@example.com',     type:'email'},
+  {k:'phone',     lbl:'Phone',     icon:'📞', ph:'+1 (555) 000-0000',     type:'tel'},
+  {k:'website',   lbl:'Website',   icon:'🌐', ph:'https://example.com',   type:'url'},
+  {k:'address',   lbl:'Address',   icon:'📍', ph:'123 Main St, City',     multi:true},
+  {k:'notes',     lbl:'Notes',     icon:'📝', ph:'Any notes…',            multi:true},
+];
+
+function formModal() {
+  const seed = detailCard || scanned || {};
+  const isEdit = modal === 'edit';
+  return `
+    <div class="backdrop" id="bd">
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-title">${isEdit ? 'Edit Card' : 'Add Card'}</div>
+          <button class="close-btn" id="modal-x">✕</button>
+        </div>
+        <div class="modal-body">
+          ${scanned && !isEdit ? `<div class="scan-banner">✨ Fields filled from scan — please review and correct anything before saving.</div>` : ''}
+          ${FIELDS.map(f => `
+            <div class="field">
+              <div class="f-label"><span class="fi">${f.icon}</span>${f.lbl}${f.req?`<span class="req"> *</span>`:''}
+              </div>
+              ${f.multi
+                ? `<textarea class="f-input" id="f-${f.k}" placeholder="${f.ph}">${esc(seed[f.k]||'')}</textarea>`
+                : `<input class="f-input" id="f-${f.k}" type="${f.type||'text'}" placeholder="${f.ph}" value="${esc(seed[f.k]||'')}">`}
+              ${f.req ? `<div class="err-msg" id="err-${f.k}">Name is required.</div>` : ''}
+            </div>`).join('')}
+
+          <div class="field">
+            <div class="f-label"><span class="fi">🏷️</span>Tags</div>
+            <div class="form-chips" id="fc">
+              ${formTags.map((t,i)=>`<span class="form-chip">${esc(t)}<button class="chip-x" data-ti="${i}">✕</button></span>`).join('')}
+            </div>
+            <div class="tag-row">
+              <input class="tag-inp" id="tag-inp" placeholder="Add a tag…" value="${esc(tagDraft)}">
+              <button class="tag-add" id="tag-add-btn">Add</button>
+            </div>
+          </div>
+
+          <button class="save-btn" id="save-btn">${isEdit ? '✓ Save Changes' : '＋ Add Card'}</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function detailModal() {
+  if (!detailCard) return '';
+  const c = detailCard;
+  const rows = [
+    {lbl:'Company',   icon:'🏢', val:c.company},
+    {lbl:'Job Title', icon:'💼', val:c.job_title},
+    {lbl:'Email',     icon:'✉️', val:c.email,   href: c.email   ? `mailto:${c.email}`   : null},
+    {lbl:'Phone',     icon:'📞', val:c.phone,   href: c.phone   ? `tel:${c.phone}`     : null},
+    {lbl:'Website',   icon:'🌐', val:c.website, href: c.website},
+    {lbl:'Address',   icon:'📍', val:c.address},
+    {lbl:'Notes',     icon:'📝', val:c.notes},
+  ].filter(r => r.val);
+  const tags = (c.tags||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+  return `
+    <div class="backdrop" id="bd">
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-title">${esc(c.name)}</div>
+          <button class="close-btn" id="modal-x">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-actions">
+            <button class="det-btn det-edit" id="det-edit">✏️ Edit</button>
+            <button class="det-btn det-del" id="det-del">🗑 Delete</button>
+          </div>
+          ${rows.map(r=>`
+            <div class="det-field">
+              <div class="det-icon">${r.icon}</div>
+              <div class="det-content">
+                <div class="det-lbl">${r.lbl}</div>
+                <div class="det-val">${r.href ? `<a href="${esc(r.href)}">${esc(r.val)}</a>` : esc(r.val)}</div>
+              </div>
+            </div>`).join('')}
+          ${tags ? `
+            <div class="det-field">
+              <div class="det-icon">🏷️</div>
+              <div class="det-content">
+                <div class="det-lbl">Tags</div>
+                <div class="tag-chips" style="margin-top:4px">${tags}</div>
+              </div>
+            </div>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Event binding ─────────────────────────────────────────────────────────────
+function bind() {
+  // Nav
+  document.querySelectorAll('[data-nav]').forEach(b =>
+    b.addEventListener('click', () => { tab = b.dataset.nav; fabOpen = false; render(); })
+  );
+
+  // Search
+  const si = document.getElementById('si');
+  if (si) si.addEventListener('input', e => { search = e.target.value; render(); });
+
+  // Tag filters
+  document.querySelectorAll('[data-tag]').forEach(b =>
+    b.addEventListener('click', () => {
+      const t = b.dataset.tag;
+      activeTag = t === '' ? null : (activeTag === t ? null : t);
+      render();
+    })
+  );
+
+  // Card rows → detail
+  document.querySelectorAll('[data-id]').forEach(el =>
+    el.addEventListener('click', () => {
+      detailCard = cards.find(c => c.id === el.dataset.id) || null;
+      if (detailCard) { modal = 'detail'; render(); }
+    })
+  );
+
+  // FAB
+  q('fab', () => { fabOpen = !fabOpen; render(); });
+  q('fab-bd', () => { fabOpen = false; render(); });
+  q('fab-scan', () => { fabOpen = false; render(); document.getElementById('photo-input').click(); });
+  q('fab-manual', () => { fabOpen = false; openAdd(); });
+
+  // Modal backdrop close
+  const bd = document.getElementById('bd');
+  if (bd) bd.addEventListener('click', e => { if (e.target === bd) closeModal(); });
+  q('modal-x', closeModal);
+
+  // Form events
+  q('save-btn', handleSave);
+  const ti = document.getElementById('tag-inp');
+  if (ti) {
+    ti.addEventListener('input', e => { tagDraft = e.target.value; });
+    ti.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
+  }
+  q('tag-add-btn', addTag);
+  document.querySelectorAll('[data-ti]').forEach(b =>
+    b.addEventListener('click', () => { formTags.splice(+b.dataset.ti, 1); render(); })
+  );
+
+  // Detail actions
+  q('det-edit', () => {
+    formTags = [...(detailCard.tags || [])];
+    scanned = null;
+    modal = 'edit';
+    render();
+  });
+  q('det-del', () => {
+    if (confirm(`Delete "${detailCard.name}"? This cannot be undone.`)) {
+      cards = cards.filter(c => c.id !== detailCard.id);
+      saveCards(cards);
+      closeModal();
+    }
+  });
+
+  // Export
+  q('exp-csv',  exportCSV);
+  q('exp-vcf',  exportVCard);
+
+  // Settings
+  q('save-key-btn', () => {
+    const k = document.getElementById('api-key-input')?.value.trim() || '';
+    saveApiKey(k);
+    const el = document.getElementById('key-saved');
+    if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2000); }
+  });
+
+  // Photo
+  document.getElementById('photo-input').addEventListener('change', onPhoto);
+}
+
+function q(id, fn) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', fn);
+}
+
+// ── Form helpers ──────────────────────────────────────────────────────────────
+function openAdd() {
+  detailCard = null; scanned = null; formTags = []; tagDraft = '';
+  modal = 'add'; render();
+}
+
+function closeModal() {
+  modal = null; detailCard = null; scanned = null; formTags = []; tagDraft = '';
+  render();
+}
+
+function getFormData() {
+  const v = id => document.getElementById('f-' + id)?.value.trim() || null;
+  return {
+    name: v('name'), company: v('company'), job_title: v('job_title'),
+    email: v('email'), phone: v('phone'), website: v('website'),
+    address: v('address'), notes: v('notes'), tags: [...formTags],
+  };
+}
+
+function handleSave() {
+  const data = getFormData();
+  if (!data.name) {
+    document.getElementById('f-name')?.classList.add('err');
+    const em = document.getElementById('err-name');
+    if (em) em.classList.add('show');
+    return;
+  }
+  if (modal === 'edit' && detailCard) {
+    const idx = cards.findIndex(c => c.id === detailCard.id);
+    if (idx >= 0) cards[idx] = { ...detailCard, ...data, updated_at: new Date().toISOString() };
+  } else {
+    cards.push({ id: uid(), ...data, created_at: new Date().toISOString() });
+  }
+  saveCards(cards);
+  closeModal();
+}
+
+function addTag() {
+  const val = (tagDraft || document.getElementById('tag-inp')?.value || '').trim();
+  if (!val || formTags.includes(val)) { tagDraft = ''; render(); return; }
+  formTags.push(val);
+  tagDraft = '';
+  render();
+}
+
+// ── Camera / AI scan ──────────────────────────────────────────────────────────
+async function onPhoto(e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+
+  const apiKey = loadApiKey();
+  if (!apiKey) {
+    alert('To use AI scanning, please add your Anthropic API key in the Settings tab first.');
+    tab = 'settings'; render(); return;
+  }
+
+  document.getElementById('scan-overlay').classList.add('show');
+
+  try {
+    const b64 = await toBase64(file);
+    const mt  = file.type || 'image/jpeg';
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-7',
+        max_tokens: 512,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mt, data: b64 } },
+            { type: 'text',  text:  'Extract all contact information from this business card. Return ONLY a JSON object:\n{"name":null,"company":null,"job_title":null,"email":null,"phone":null,"website":null,"address":null}\nUse null for any field not present.' },
+          ],
+        }],
+      }),
+    });
+
+    document.getElementById('scan-overlay').classList.remove('show');
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({}));
+      throw new Error(err.error?.message || 'API error ' + resp.status);
+    }
+
+    const result = await resp.json();
+    const text   = result.content[0].text.trim();
+    const match  = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Could not read data from image');
+
+    scanned    = JSON.parse(match[0]);
+    detailCard = null;
+    formTags   = [];
+    tagDraft   = '';
+    modal      = 'add';
+    render();
+
+  } catch (err) {
+    document.getElementById('scan-overlay').classList.remove('show');
+    alert('Scan failed: ' + err.message + '\n\nCheck that your API key is correct in Settings.');
+  }
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
+function dl(content, name, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type}));
+  a.download = name;
+  a.click();
+}
+
+function exportCSV() {
+  const e = v => { if (!v && v!==0) return ''; const s=String(v); return (s.includes(',')||s.includes('"')||s.includes('\n')) ? `"${s.replace(/"/g,'""')}"` : s; };
+  const hdr = ['Name','Company','Job Title','Email','Phone','Website','Address','Notes','Tags'].join(',');
+  const rows = cards.map(c => [c.name,c.company,c.job_title,c.email,c.phone,c.website,c.address,c.notes,(c.tags||[]).join('; ')].map(e).join(','));
+  dl([hdr,...rows].join('\r\n'), 'business-cards.csv', 'text/csv');
+}
+
+function exportVCard() {
+  const e = v => v ? String(v).replace(/\\/g,'\\\\').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n') : '';
+  const vcards = cards.map(c => {
+    const parts = (c.name||'').trim().split(/\s+/);
+    const last  = parts.length > 1 ? parts[parts.length-1] : '';
+    const first = parts.length > 1 ? parts.slice(0,-1).join(' ') : parts[0];
+    const lines = ['BEGIN:VCARD','VERSION:3.0',`FN:${e(c.name)}`,`N:${e(last)};${e(first)};;;`];
+    if (c.company)   lines.push(`ORG:${e(c.company)}`);
+    if (c.job_title) lines.push(`TITLE:${e(c.job_title)}`);
+    if (c.email)     lines.push(`EMAIL;TYPE=INTERNET:${e(c.email)}`);
+    if (c.phone)     lines.push(`TEL;TYPE=WORK,VOICE:${e(c.phone)}`);
+    if (c.website)   lines.push(`URL:${e(c.website)}`);
+    if (c.address)   lines.push(`ADR;TYPE=WORK:;;${e(c.address)};;;;`);
+    if (c.notes)     lines.push(`NOTE:${e(c.notes)}`);
+    if ((c.tags||[]).length) lines.push(`CATEGORIES:${c.tags.map(e).join(',')}`);
+    lines.push('END:VCARD');
+    return lines.join('\r\n');
+  });
+  dl(vcards.join('\r\n\r\n'), 'business-cards.vcf', 'text/vcard');
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
