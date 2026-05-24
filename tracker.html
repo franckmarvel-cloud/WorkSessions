@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FitTrack">
+<title>FitTrack — 6-Week Cut</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;--border:#252525;
+  --text:#f0f0f0;--muted:#777;--accent:#4ade80;--accent-dim:#4ade8022;
+  --warn:#f59e0b;--danger:#ef4444;--blue:#60a5fa;--purple:#a78bfa;--cyan:#22d3ee;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  overscroll-behavior:none}
+.app{max-width:480px;margin:0 auto;min-height:100dvh;padding-bottom:72px}
+
+/* ── HEADER ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 16px 0;position:sticky;top:0;z-index:100;
+  padding-top:max(12px,env(safe-area-inset-top))}
+.hdr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.hdr-title{font-size:19px;font-weight:800;color:var(--accent);letter-spacing:-0.3px}
+.hdr-date{font-size:12px;color:var(--muted)}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
+  border-top:1px solid var(--border);display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom)}
+.bni{flex:1;padding:10px 4px;text-align:center;border:none;background:none;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;
+  -webkit-tap-highlight-color:transparent;transition:opacity .1s}
+.bni:active{opacity:.6}
+.bni-icon{font-size:22px;line-height:1}
+.bni-label{font-size:10px;color:var(--muted);font-weight:500}
+.bni.active .bni-label{color:var(--accent)}
+
+/* ── SECTIONS ── */
+.sec{display:none;padding:12px 12px 0}
+.sec.active{display:block}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:14px 14px;margin-bottom:10px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+
+/* ── HERO CARD ── */
+.hero{background:linear-gradient(135deg,#0c1a13,#071810);border-color:#1a3a28}
+.hero-week{font-size:12px;font-weight:700;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.hero-session{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:10px}
+.hero-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;
+  border-radius:20px;font-size:13px;font-weight:700}
+.badge-green{background:var(--accent);color:#000}
+.badge-warn{background:var(--warn);color:#000;animation:pulse 2s infinite}
+.badge-muted{background:var(--surface2);color:var(--muted);font-size:12px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+.photo-alert{margin-top:10px;padding:8px 12px;background:#f59e0b18;
+  border:1px solid #f59e0b40;border-radius:10px;font-size:13px;color:var(--warn);font-weight:500}
+
+/* ── WORKOUT LIST ── */
+.ex-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ex-progress{font-size:13px;font-weight:700;color:var(--accent)}
+.ex-item{display:flex;align-items:center;gap:10px;padding:11px 0;
+  border-bottom:1px solid var(--border)}
+.ex-item:last-child{border-bottom:none;padding-bottom:0}
+.ex-cb{width:30px;height:30px;min-width:30px;border-radius:9px;
+  border:2px solid var(--border);background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;-webkit-tap-highlight-color:transparent}
+.ex-cb.on{background:var(--accent);border-color:var(--accent)}
+.ex-cb.on::after{content:'✓';color:#000;font-weight:900;font-size:15px}
+.ex-body{flex:1;min-width:0}
+.ex-link{color:var(--blue);text-decoration:none;font-size:15px;font-weight:500;
+  display:block;line-height:1.3}
+.ex-sets{font-size:12px;color:var(--muted);margin-top:1px}
+.ex-item.done .ex-link{color:var(--muted);text-decoration:line-through}
+.ex-done-msg{text-align:center;padding:12px;color:var(--accent);
+  font-weight:700;font-size:15px}
+.btn-all{margin-top:8px;width:100%;padding:10px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+.btn-all:active{opacity:.7}
+
+/* ── DAILY LOG ── */
+.log-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.log-toggle{background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:12px 10px;cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;text-align:left}
+.log-toggle.on{background:var(--accent-dim);border-color:var(--accent)}
+.log-icon{font-size:20px;width:26px;text-align:center;flex-shrink:0}
+.log-text{flex:1;min-width:0}
+.log-name{font-size:13px;font-weight:600;display:block;color:var(--text)}
+.log-sub{font-size:11px;color:var(--muted)}
+.log-dot{width:18px;height:18px;border-radius:50%;background:var(--border);
+  flex-shrink:0;transition:background .15s}
+.log-toggle.on .log-dot{background:var(--accent)}
+.log-nums{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.log-num{background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px}
+.log-num.steps-hit{border-color:var(--accent);background:var(--accent-dim)}
+.num-inp{background:none;border:none;color:var(--text);font-size:19px;
+  font-weight:700;width:100%;outline:none;text-align:right;min-width:0}
+.num-inp::placeholder{color:var(--muted);font-weight:400;font-size:16px}
+.trained-row{margin-top:8px;display:flex;align-items:center;gap:8px;
+  padding:10px 12px;border-radius:12px;background:var(--surface2);
+  border:1px solid var(--border)}
+.trained-row.on{background:var(--accent-dim);border-color:var(--accent)}
+
+/* ── WEIGHT TAB ── */
+.wt-hero{text-align:center;padding:16px 0 12px}
+.wt-avg{font-size:58px;font-weight:900;color:var(--accent);line-height:1;
+  letter-spacing:-2px}
+.wt-avg-lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.wt-today{font-size:22px;color:var(--muted);margin-top:6px}
+.wt-change{font-size:16px;font-weight:700;margin-top:6px}
+.wt-change.neg{color:var(--accent)}
+.wt-change.pos{color:var(--danger)}
+.wt-input-row{display:flex;gap:8px}
+.big-inp{flex:1;background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;color:var(--text);font-size:22px;
+  font-weight:700;outline:none;text-align:center}
+.big-inp:focus{border-color:var(--accent)}
+.btn-primary{padding:14px 20px;border-radius:12px;border:none;
+  font-size:15px;font-weight:700;cursor:pointer;background:var(--accent);
+  color:#000;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.btn-primary:active{opacity:.7}
+.btn-sec{padding:14px 20px;border-radius:12px;border:1px solid var(--border);
+  font-size:15px;font-weight:600;cursor:pointer;background:var(--surface2);
+  color:var(--text);-webkit-tap-highlight-color:transparent}
+.btn-sec:active{opacity:.7}
+.chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px}
+
+/* ── PROGRESS TAB ── */
+.photo-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;
+  border-bottom:1px solid var(--border)}
+.photo-item:last-child{border-bottom:none}
+.photo-cb{width:34px;height:34px;min-width:34px;border-radius:50%;
+  border:2px solid var(--warn);background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;transition:all .15s;-webkit-tap-highlight-color:transparent;margin-top:2px}
+.photo-cb.taken{background:var(--warn);border-color:var(--warn)}
+.photo-info{flex:1;min-width:0}
+.photo-name{font-weight:700;font-size:15px}
+.photo-date{font-size:12px;color:var(--muted);margin-bottom:4px}
+.photo-note{width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;
+  outline:none;resize:none;font-family:inherit;margin-top:4px}
+.photo-note:focus{border-color:var(--warn)}
+.prog-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.prog-lbl{font-size:12px;color:var(--muted);width:72px;flex-shrink:0}
+.prog-bars{flex:1;display:flex;gap:3px}
+.prog-bar-bg{flex:1;height:9px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.prog-count{font-size:12px;font-weight:700;width:24px;text-align:right}
+.prog-week-lbl{display:flex;gap:3px;padding:0 0 4px 72px;margin-bottom:2px}
+.prog-week-lbl span{flex:1;font-size:10px;color:var(--muted);text-align:center}
+.wk-table{width:100%;border-collapse:collapse;font-size:13px}
+.wk-table th{padding:6px 4px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);text-align:center;font-size:12px}
+.wk-table th:first-child{text-align:left}
+.wk-table td{padding:9px 4px;border-bottom:1px solid var(--border);text-align:center}
+.wk-table td:first-child{text-align:left;font-weight:700}
+.wk-table tr:last-child td{border-bottom:none}
+.wk-badge{display:inline-block;padding:2px 7px;border-radius:6px;
+  font-size:11px;font-weight:700}
+.wk-good{background:#4ade8022;color:var(--accent)}
+.wk-ok{background:#f59e0b22;color:var(--warn)}
+.wk-bad{background:#ef444422;color:var(--danger)}
+
+/* ── DATA TAB ── */
+.export-row{display:flex;gap:8px;margin-bottom:10px}
+.export-row .btn-primary,.export-row .btn-sec{flex:1;text-align:center}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-cell .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.05em}
+.info-cell .val{font-size:16px;font-weight:700;margin-top:1px}
+.instructions{font-size:13px;color:var(--muted);line-height:1.7}
+.instructions strong{color:var(--text)}
+hr.div{border:none;border-top:1px solid var(--border);margin:12px 0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:82px;left:50%;
+  transform:translateX(-50%) translateY(12px);
+  background:#1e1e1e;border:1px solid var(--border);
+  padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;
+  opacity:0;transition:all .25s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── UTILS ── */
+.mt8{margin-top:8px}.mt10{margin-top:10px}.mt12{margin-top:12px}
+.text-accent{color:var(--accent)}.text-muted{color:var(--muted)}
+.text-sm{font-size:13px}.text-xs{font-size:11px}
+.fw7{font-weight:700}.tc{text-align:center}
+.divider{height:1px;background:var(--border);margin:10px 0}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-row">
+      <div class="hdr-title">FitTrack 💪</div>
+      <div class="hdr-date" id="hdrDate"></div>
+    </div>
+  </div>
+
+  <!-- TODAY TAB -->
+  <div class="sec active" id="sec-today">
+    <div class="card hero" id="heroCard"></div>
+    <div class="card" id="workoutCard"></div>
+    <div class="card">
+      <div class="card-title">Daily Log</div>
+      <div class="log-grid" id="logGrid"></div>
+      <div class="log-nums" id="logNums"></div>
+      <div class="trained-row" id="trainedRow" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- WEIGHT TAB -->
+  <div class="sec" id="sec-weight">
+    <div class="card">
+      <div class="card-title">Morning Weigh-In</div>
+      <div class="wt-hero" id="wtHero"></div>
+      <div class="wt-input-row">
+        <input class="big-inp" type="number" id="wtInput"
+               placeholder="lbs" step="0.1" inputmode="decimal">
+        <button class="btn-primary" onclick="saveWeight()">Save</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">39-Day Weight Trend</div>
+      <div class="chart-wrap" id="wtChart"></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS TAB -->
+  <div class="sec" id="sec-progress">
+    <div class="card">
+      <div class="card-title">📷 Progress Photos</div>
+      <div id="photoDays"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Weekly Adherence</div>
+      <div id="adherence"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Weekly Summary</div>
+      <div id="wkSummary"></div>
+    </div>
+  </div>
+
+  <!-- DATA TAB -->
+  <div class="sec" id="sec-data">
+    <div class="card">
+      <div class="card-title">Backup & Restore</div>
+      <p class="text-sm text-muted" style="margin-bottom:12px;line-height:1.6">
+        <strong style="color:var(--warn)">Export every Sunday.</strong>
+        localStorage can be wiped by the browser. Save backups to iCloud Drive or email to yourself.
+      </p>
+      <div class="export-row">
+        <button class="btn-primary" onclick="exportData()">⬇ Export JSON</button>
+        <button class="btn-sec" onclick="document.getElementById('importFile').click()">⬆ Import JSON</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <div class="text-xs text-muted" id="lastExportLbl"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Program Info</div>
+      <div id="progInfo"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📱 Add to iPhone Home Screen</div>
+      <div class="instructions">
+        1. Open <strong>tracker.html</strong> in <strong>Safari</strong> (not Chrome)<br>
+        2. Tap the <strong>Share</strong> button (box with ↑ arrow)<br>
+        3. Scroll and tap <strong>Add to Home Screen</strong><br>
+        4. Tap <strong>Add</strong> — done!<br><br>
+        It opens full-screen like a native app. The file itself is your backup — keep it in iCloud Drive and re-open it there so Safari's localStorage persists across launches from the home screen icon.
+      </div>
+    </div>
+  </div>
+
+</div><!-- .app -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bni active" id="bn-today" onclick="showTab('today')">
+    <span class="bni-icon">🏠</span><span class="bni-label">Today</span>
+  </button>
+  <button class="bni" id="bn-weight" onclick="showTab('weight')">
+    <span class="bni-icon">⚖️</span><span class="bni-label">Weight</span>
+  </button>
+  <button class="bni" id="bn-progress" onclick="showTab('progress')">
+    <span class="bni-icon">📊</span><span class="bni-label">Progress</span>
+  </button>
+  <button class="bni" id="bn-data" onclick="showTab('data')">
+    <span class="bni-icon">💾</span><span class="bni-label">Data</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════
+const START      = new Date('2026-05-24T00:00:00');
+const DEADLINE   = new Date('2026-07-02T00:00:00');
+const START_WT   = 292;
+const PROT_GOAL  = 225;
+const CAL_GOAL   = 2100;
+const STEPS_GOAL = 10000;
+const SLEEP_MIN  = 7.5;
+const SLEEP_MAX  = 8.5;
+
+const PHOTO_DAYS = [
+  { label:'Day 1 — Start',      date:'2026-05-24' },
+  { label:'Day 21 — Check-in',  date:'2026-06-13' },
+  { label:'Final — June 28',    date:'2026-06-28' },
+];
+
+// Indexed by JS .getDay() (0=Sun … 6=Sat)
+const SPLIT = {
+  0:{name:'Upper / Full Body', type:'gym', exercises:[
+    {name:'Incline DB press',           sets:'4 × 8'},
+    {name:'Pull-ups',                   sets:'4 × max'},
+    {name:'DB shoulder press',          sets:'3 × 10'},
+    {name:'Chest-supported row',        sets:'3 × 12'},
+    {name:'Cable face pull',            sets:'3 × 15'},
+    {name:'Triceps + biceps superset',  sets:'3 × 12–15'},
+  ]},
+  1:{name:'Home — Cardio', type:'home', exercises:[
+    {name:'Rope intervals',   sets:'45 s hard / 30–60 s rest × 8–12 rounds'},
+    {name:'20–30 min walk',   sets:'outdoors'},
+  ]},
+  2:{name:'Lower Body Strength', type:'gym', exercises:[
+    {name:'Barbell back squat',   sets:'4 × 6–8'},
+    {name:'Romanian deadlift',    sets:'3 × 8–10'},
+    {name:'Leg press',            sets:'3 × 10–12'},
+    {name:'Walking lunges',       sets:'3 × 12 each'},
+    {name:'Leg curl machine',     sets:'3 × 12–15'},
+    {name:'Weighted calf raise',  sets:'4 × 12–15'},
+  ]},
+  3:{name:'Home — DB Circuit', type:'home', exercises:[
+    {name:'Goblet squat',        sets:'3–4 rounds × 15'},
+    {name:'DB floor press',      sets:'3–4 rounds × 12'},
+    {name:'One-arm row',         sets:'3–4 rounds × 12 each'},
+    {name:'RDL',                 sets:'3–4 rounds × 12'},
+    {name:'Curl-to-press',       sets:'3–4 rounds × 10'},
+    {name:'60 s rope or plank',  sets:'3–4 rounds'},
+    {name:'20–30 min walk',      sets:'outdoors'},
+  ]},
+  4:{name:'Upper Body Strength', type:'gym', exercises:[
+    {name:'Barbell bench press',       sets:'4 × 6–8'},
+    {name:'Seated cable row',          sets:'4 × 8–10'},
+    {name:'Overhead press',            sets:'3 × 8–10'},
+    {name:'Lat pulldown',              sets:'3 × 10–12'},
+    {name:'DB lateral raise',          sets:'3 × 12–15'},
+    {name:'Triceps + biceps superset', sets:'3 × 12–15'},
+  ]},
+  5:{name:'Rest + Mobility', type:'rest', exercises:[
+    {name:'20–30 min walk',  sets:'outdoors'},
+    {name:'10 min mobility', sets:'stretching / foam roll'},
+  ]},
+  6:{name:'Lower / Posterior Chain', type:'gym', exercises:[
+    {name:'Trap bar deadlift',                sets:'4 × 5'},
+    {name:'Bulgarian split squat',            sets:'3 × 10 each'},
+    {name:'Barbell hip thrust',               sets:'3 × 10–12'},
+    {name:'Hack or goblet squat',             sets:'3 × 12'},
+    {name:'Seated leg curl',                  sets:'3 × 15'},
+    {name:'Loaded carry + hanging leg raise', sets:'3 rounds'},
+  ]},
+};
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+function loadState(){
+  try{ return JSON.parse(localStorage.getItem('ft_v1') || '{}'); }
+  catch(e){ return {}; }
+}
+function saveState(){
+  localStorage.setItem('ft_v1', JSON.stringify(ST));
+}
+let ST = loadState();
+if(!ST.days) ST.days = {};
+if(!ST.photos) ST.photos = {};
+
+function dayData(key){
+  if(!ST.days[key]) ST.days[key] = {};
+  return ST.days[key];
+}
+
+// ═══════════════════════════════════════════════════
+//  DATE UTILS
+// ═══════════════════════════════════════════════════
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function keyToDate(k){
+  const [y,m,d] = k.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function dateToKey(d){
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function progDay(key){
+  return Math.floor((keyToDate(key) - START) / 86400000) + 1;
+}
+function progWeek(key){
+  return Math.ceil(progDay(key) / 7);
+}
+function daysLeft(){
+  const t = new Date(); t.setHours(0,0,0,0);
+  return Math.ceil((DEADLINE - t) / 86400000);
+}
+function fmtDate(key){
+  return keyToDate(key).toLocaleDateString('en-US',{month:'short',day:'numeric',weekday:'short'});
+}
+function splitFor(key){ return SPLIT[keyToDate(key).getDay()]; }
+
+function ytUrl(name){
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(name+' proper form')}`;
+}
+
+// ═══════════════════════════════════════════════════
+//  WEIGHT UTILS
+// ═══════════════════════════════════════════════════
+function allWeights(){
+  return Object.entries(ST.days)
+    .filter(([,v]) => v.weight != null)
+    .sort(([a],[b]) => a < b ? -1 : 1)
+    .map(([key,v]) => ({key, w: v.weight}));
+}
+function rollingAvg(wts, key, win=7){
+  const i = wts.findIndex(x => x.key === key);
+  if(i < 0) return null;
+  const sl = wts.slice(Math.max(0, i-win+1), i+1);
+  return sl.reduce((s,x) => s+x.w, 0) / sl.length;
+}
+function sevenDayAvg(){
+  const wts = allWeights();
+  if(!wts.length) return null;
+  return rollingAvg(wts, wts[wts.length-1].key, 7);
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER — TODAY
+// ═══════════════════════════════════════════════════
+function renderToday(){
+  const key  = todayKey();
+  const dd   = dayData(key);
+  const sp   = splitFor(key);
+  const day  = progDay(key);
+  const week = progWeek(key);
+  const left = daysLeft();
+  const photo= PHOTO_DAYS.find(p => p.date === key);
+
+  // ── Hero
+  const typeLabel = sp.type==='gym'?'🏋️ Gym' : sp.type==='home'?'🏠 Home' : '😴 Rest';
+  document.getElementById('heroCard').innerHTML = `
+    <div class="hero-week">Week ${week} · Day ${day} of 39</div>
+    <div class="hero-session">${sp.name}</div>
+    <div class="hero-meta">
+      <span class="badge badge-green">${left}d left</span>
+      ${photo?`<span class="badge badge-warn">📷 Photo Day</span>`:''}
+      <span class="badge badge-muted">${typeLabel}</span>
+    </div>
+    ${photo?`<div class="photo-alert">📷 Take your <strong>${photo.label}</strong> progress photo today!</div>`:''}
+  `;
+
+  // ── Workout
+  if(!dd.ex) dd.ex = {};
+  const exs   = sp.exercises;
+  const doneCt= exs.filter((_,i) => dd.ex[i]).length;
+  const allDone = doneCt === exs.length;
+  const title = sp.type==='rest' ? 'Rest Day Activities' : "Today's Workout";
+
+  let exHTML = exs.map((e, i) => `
+    <div class="ex-item${dd.ex[i]?' done':''}">
+      <button class="ex-cb${dd.ex[i]?' on':''}" onclick="toggleEx(${i})"
+              aria-label="Toggle ${e.name}"></button>
+      <div class="ex-body">
+        <a class="ex-link" href="${ytUrl(e.name)}" target="_blank" rel="noopener noreferrer">${e.name}</a>
+        <div class="ex-sets">${e.sets}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('workoutCard').innerHTML = `
+    <div class="ex-header">
+      <div class="card-title" style="margin:0">${title}</div>
+      <div class="ex-progress">${doneCt}/${exs.length}</div>
+    </div>
+    ${exHTML}
+    ${allDone && exs.length > 1
+      ? '<div class="ex-done-msg">💪 Session Complete!</div>'
+      : `<button class="btn-all" onclick="markAllEx()">Mark all done</button>`}
+  `;
+
+  // ── Log toggles
+  const toggles = [
+    {key:'protein',  icon:'🥩', name:'Protein',  sub:`${PROT_GOAL}g target`},
+    {key:'calories', icon:'🍽️', name:'Calories', sub:`${CAL_GOAL} kcal`},
+    {key:'water',    icon:'💧', name:'Water',    sub:'1 gallon'},
+    {key:'mobility', icon:'🧘', name:'Mobility', sub:'10 min'},
+  ];
+  document.getElementById('logGrid').innerHTML = toggles.map(t => `
+    <button class="log-toggle${dd[t.key]?' on':''}" onclick="toggleLog('${t.key}')">
+      <span class="log-icon">${t.icon}</span>
+      <span class="log-text">
+        <span class="log-name">${t.name}</span>
+        <span class="log-sub">${t.sub}</span>
+      </span>
+      <span class="log-dot"></span>
+    </button>
+  `).join('');
+
+  // ── Sleep + Steps
+  const stepsHit = (dd.steps || 0) >= STEPS_GOAL;
+  document.getElementById('logNums').innerHTML = `
+    <div class="log-num">
+      <span class="log-icon">😴</span>
+      <span class="log-text">
+        <span class="log-name">Sleep</span>
+        <span class="log-sub">${SLEEP_MIN}–${SLEEP_MAX}h</span>
+      </span>
+      <input class="num-inp" type="number" inputmode="decimal"
+             step="0.5" min="0" max="16" placeholder="hrs"
+             value="${dd.sleep||''}"
+             style="width:60px"
+             onchange="saveNum('sleep',this.value)">
+    </div>
+    <div class="log-num${stepsHit?' steps-hit':''}">
+      <span class="log-icon">👟</span>
+      <span class="log-text">
+        <span class="log-name">Steps</span>
+        <span class="log-sub">goal ${STEPS_GOAL.toLocaleString()}</span>
+      </span>
+      <input class="num-inp" type="number" inputmode="numeric"
+             step="500" min="0" max="60000" placeholder="0"
+             value="${dd.steps||''}"
+             style="width:72px"
+             onchange="saveNum('steps',this.value)">
+    </div>
+  `;
+
+  // ── Trained (auto from exercises)
+  const trainedAuto = doneCt > 0;
+  if(trainedAuto) { dd.trained = true; }
+  document.getElementById('trainedRow').className = 'trained-row' + (dd.trained?' on':'');
+  document.getElementById('trainedRow').innerHTML = `
+    <span class="log-icon">💪</span>
+    <span class="log-text">
+      <span class="log-name">Trained</span>
+      <span class="log-sub">${trainedAuto?'Auto-detected from workout':'Toggle manually'}</span>
+    </span>
+    <span class="log-dot"></span>
+    ${!trainedAuto?`<button onclick="toggleLog('trained')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:4px 10px;color:var(--muted);font-size:12px;cursor:pointer">${dd.trained?'Undo':'Mark'}</button>`:''}
+  `;
+
+  saveState();
+}
+
+function toggleEx(i){
+  const key = todayKey();
+  const dd = dayData(key);
+  if(!dd.ex) dd.ex = {};
+  dd.ex[i] = !dd.ex[i];
+  saveState();
+  renderToday();
+}
+
+function markAllEx(){
+  const key = todayKey();
+  const dd = dayData(key);
+  const sp = splitFor(key);
+  if(!dd.ex) dd.ex = {};
+  sp.exercises.forEach((_,i) => { dd.ex[i] = true; });
+  saveState();
+  renderToday();
+}
+
+function toggleLog(field){
+  const key = todayKey();
+  const dd = dayData(key);
+  dd[field] = !dd[field];
+  saveState();
+  renderToday();
+}
+
+function saveNum(field, val){
+  const key = todayKey();
+  const dd = dayData(key);
+  dd[field] = parseFloat(val) || 0;
+  saveState();
+  // Refresh steps highlight without full re-render
+  if(field === 'steps') renderToday();
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER — WEIGHT
+// ═══════════════════════════════════════════════════
+function renderWeight(){
+  const key = todayKey();
+  const dd  = dayData(key);
+  const wts = allWeights();
+  const avg = sevenDayAvg();
+  const todayW = dd.weight;
+
+  let heroHTML;
+  if(avg != null){
+    const chg = avg - START_WT;
+    const chgStr = chg <= 0
+      ? `↓ ${Math.abs(chg).toFixed(1)} lbs from start`
+      : `↑ ${chg.toFixed(1)} lbs from start`;
+    heroHTML = `
+      <div class="wt-avg">${avg.toFixed(1)}</div>
+      <div class="wt-avg-lbl">7-day rolling average · lbs</div>
+      ${todayW != null
+        ? `<div class="wt-today">Today: ${todayW} lbs</div>`
+        : `<div class="wt-today" style="color:var(--muted);font-size:14px">Enter today's weight below</div>`}
+      <div class="wt-change ${chg<=0?'neg':'pos'}">${chgStr}</div>
+    `;
+  } else {
+    heroHTML = `
+      <div class="wt-avg" style="color:var(--muted)">---</div>
+      <div class="wt-avg-lbl">7-day rolling average</div>
+      <div class="wt-today" style="font-size:14px;color:var(--muted)">Start: ${START_WT} lbs</div>
+    `;
+  }
+  document.getElementById('wtHero').innerHTML = heroHTML;
+
+  const inp = document.getElementById('wtInput');
+  if(todayW != null && !inp.matches(':focus')) inp.value = todayW;
+
+  renderWeightChart();
+}
+
+function saveWeight(){
+  const val = parseFloat(document.getElementById('wtInput').value);
+  if(!val || val < 80 || val > 600){ showToast('Enter a valid weight'); return; }
+  const key = todayKey();
+  dayData(key).weight = val;
+  saveState();
+  renderWeight();
+  showToast(`Saved: ${val} lbs`);
+}
+
+function renderWeightChart(){
+  const el  = document.getElementById('wtChart');
+  const wts = allWeights();
+  if(wts.length < 2){
+    el.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:13px">Log 2+ weigh-ins to see the chart</div>';
+    return;
+  }
+
+  // Build 39-day scaffold (all program days)
+  const allKeys = [];
+  for(let i = 0; i < 39; i++){
+    const d = new Date(START); d.setDate(d.getDate()+i);
+    if(d > DEADLINE) break;
+    allKeys.push(dateToKey(d));
+  }
+
+  // Map weight data
+  const pts = allKeys.map(key => {
+    const found = wts.find(w => w.key === key);
+    return { key, w: found ? found.w : null };
+  });
+
+  // Rolling avg at each logged point
+  const ptsWith = pts.map((p, i) => {
+    if(p.w == null) return {...p, avg: null};
+    // Find rolling avg using only logged pts
+    const loggedUpTo = wts.filter(w => w.key <= p.key);
+    const win = loggedUpTo.slice(-7);
+    const avg = win.reduce((s,x)=>s+x.w,0)/win.length;
+    return {...p, avg};
+  });
+
+  const W = Math.max(300, Math.min(500, window.innerWidth - 24));
+  const H = 200;
+  const pad = {t:24,r:12,b:28,l:42};
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+  const n  = ptsWith.length;
+
+  const allVals = ptsWith.flatMap(p => [p.w, p.avg]).filter(x=>x!=null);
+  if(!allVals.length){ el.innerHTML=''; return; }
+  const minV = Math.min(...allVals) - 1.5;
+  const maxV = Math.max(...allVals) + 1.5;
+
+  const xs = i => pad.l + (i/(n-1)) * pw;
+  const ys = v => pad.t + (1 - (v - minV)/(maxV - minV)) * ph;
+
+  // Y ticks
+  const range = maxV - minV;
+  const tStep = range > 12 ? 5 : range > 6 ? 2 : 1;
+  const yTicks = [];
+  for(let v = Math.ceil(minV/tStep)*tStep; v <= maxV; v += tStep) yTicks.push(v);
+
+  // X labels: Sundays or week markers
+  const xLabels = ptsWith
+    .map((p,i) => ({i, p}))
+    .filter(({i,p}) => i===0 || keyToDate(p.key).getDay()===0);
+
+  // Raw daily line (only logged points)
+  const loggedPts = ptsWith.map((p,i)=>({...p,i})).filter(p=>p.w!=null);
+  const rawPath = loggedPts.map((p,j) =>
+    `${j===0?'M':'L'}${xs(p.i).toFixed(1)},${ys(p.w).toFixed(1)}`
+  ).join(' ');
+
+  // Avg line (only where avg exists)
+  const avgPts = ptsWith.map((p,i)=>({...p,i})).filter(p=>p.avg!=null);
+  const avgPath = avgPts.map((p,j) =>
+    `${j===0?'M':'L'}${xs(p.i).toFixed(1)},${ys(p.avg).toFixed(1)}`
+  ).join(' ');
+
+  // Today marker
+  const todayI = ptsWith.findIndex(p => p.key === todayKey());
+
+  el.innerHTML = `
+  <svg width="${W}" height="${H}" style="display:block;overflow:visible">
+    <!-- grid -->
+    ${yTicks.map(v=>`
+      <line x1="${pad.l}" y1="${ys(v).toFixed(1)}"
+            x2="${W-pad.r}" y2="${ys(v).toFixed(1)}"
+            stroke="#252525" stroke-width="1"/>
+      <text x="${pad.l-5}" y="${ys(v)+4}"
+            text-anchor="end" fill="#555" font-size="10">${v}</text>
+    `).join('')}
+    <!-- x labels -->
+    ${xLabels.map(({i,p})=>`
+      <text x="${xs(i).toFixed(1)}" y="${H-4}"
+            text-anchor="middle" fill="#555" font-size="10">W${progWeek(p.key)}</text>
+      <line x1="${xs(i).toFixed(1)}" y1="${pad.t}"
+            x2="${xs(i).toFixed(1)}" y2="${H-pad.b}"
+            stroke="#1e1e1e" stroke-width="1"/>
+    `).join('')}
+    <!-- raw line -->
+    ${loggedPts.length>1?`<path d="${rawPath}" fill="none" stroke="#60a5fa44" stroke-width="1.5"/>`:''}
+    <!-- raw dots -->
+    ${loggedPts.map(p=>`
+      <circle cx="${xs(p.i).toFixed(1)}" cy="${ys(p.w).toFixed(1)}"
+              r="3" fill="#60a5fa"/>
+    `).join('')}
+    <!-- avg line -->
+    ${avgPts.length>1?`<path d="${avgPath}" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linejoin="round"/>`:''}
+    <!-- today line -->
+    ${todayI>=0?`
+      <line x1="${xs(todayI).toFixed(1)}" y1="${pad.t}"
+            x2="${xs(todayI).toFixed(1)}" y2="${H-pad.b}"
+            stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3"/>
+    `:''}
+    <!-- legend -->
+    <circle cx="${pad.l+8}" cy="${pad.t-10}" r="3" fill="#60a5fa"/>
+    <text x="${pad.l+15}" y="${pad.t-6}" fill="#555" font-size="10">Daily</text>
+    <line x1="${pad.l+48}" y1="${pad.t-10}" x2="${pad.l+62}" y2="${pad.t-10}"
+          stroke="#4ade80" stroke-width="2.5"/>
+    <text x="${pad.l+66}" y="${pad.t-6}" fill="#555" font-size="10">7d avg</text>
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER — PROGRESS
+// ═══════════════════════════════════════════════════
+function renderProgress(){
+  renderPhotoDays();
+  renderAdherence();
+  renderWeeklySummary();
+}
+
+function renderPhotoDays(){
+  const today = todayKey();
+  document.getElementById('photoDays').innerHTML = PHOTO_DAYS.map(p => {
+    const pd = dayData(p.date);
+    const past = p.date <= today;
+    const taken = pd.photoTaken || false;
+    const note  = pd.photoNote  || '';
+    return `
+      <div class="photo-item">
+        <button class="photo-cb${taken?' taken':''}"
+                onclick="togglePhoto('${p.date}')"
+                ${!past?'disabled style="opacity:.3;cursor:default"':''}>
+          ${taken ? '📷' : ''}
+        </button>
+        <div class="photo-info">
+          <div class="photo-name">${p.label}</div>
+          <div class="photo-date">${fmtDate(p.date)}${p.date===today?' — TODAY':''}</div>
+          ${past ? `
+            <textarea class="photo-note" rows="1" placeholder="Add a note…"
+              onchange="savePhotoNote('${p.date}',this.value)">${escHTML(note)}</textarea>
+          ` : `<div class="text-xs text-muted">Upcoming</div>`}
+        </div>
+        ${taken ? '<span style="font-size:20px;margin-top:2px">✅</span>' : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function togglePhoto(date){
+  const pd = dayData(date);
+  pd.photoTaken = !pd.photoTaken;
+  saveState();
+  renderPhotoDays();
+}
+
+function savePhotoNote(date, val){
+  dayData(date).photoNote = val;
+  saveState();
+}
+
+function renderAdherence(){
+  const today = todayKey();
+  const METRICS = [
+    {key:'protein',  label:'Protein',  color:'#4ade80', check: dd => !!dd.protein},
+    {key:'trained',  label:'Training', color:'#60a5fa', check:(dd,key) => {
+      if(dd.trained) return true;
+      const sp = splitFor(key);
+      return sp.exercises.some((_,i) => dd.ex && dd.ex[i]);
+    }},
+    {key:'steps',    label:'Steps',    color:'#f59e0b', check: dd => (dd.steps||0) >= STEPS_GOAL},
+    {key:'water',    label:'Water',    color:'#22d3ee', check: dd => !!dd.water},
+    {key:'mobility', label:'Mobility', color:'#a78bfa', check: dd => !!dd.mobility},
+  ];
+
+  // Build week buckets
+  const weeks = Array.from({length:6}, (_,wi) => {
+    const days = [];
+    for(let d=0;d<7;d++){
+      const dt = new Date(START);
+      dt.setDate(dt.getDate() + wi*7 + d);
+      if(dt >= DEADLINE) break;
+      const k = dateToKey(dt);
+      days.push({key:k, future: k > today, dd: ST.days[k]||{}});
+    }
+    return days;
+  }).filter(w=>w.length>0);
+
+  const weekLabels = weeks.map((_,i) => `<span>W${i+1}</span>`).join('');
+
+  const rows = METRICS.map(m => {
+    const counts = weeks.map(wk => wk.filter(d => !d.future && m.check(d.dd, d.key)).length);
+    const totals = weeks.map(wk => wk.filter(d => !d.future).length);
+    const total  = counts.reduce((a,b)=>a+b,0);
+    return `
+      <div class="prog-row">
+        <span class="prog-lbl">${m.label}</span>
+        <div class="prog-bars">
+          ${counts.map((c,i) => {
+            const pct = totals[i] ? (c/totals[i]*100).toFixed(0) : 0;
+            return `
+              <div class="prog-bar-bg" title="W${i+1}: ${c}/${totals[i]}">
+                <div class="prog-bar-fill" style="width:${pct}%;background:${m.color}"></div>
+              </div>`;
+          }).join('')}
+        </div>
+        <span class="prog-count" style="color:${m.color}">${total}</span>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('adherence').innerHTML = `
+    <div class="prog-week-lbl">${weekLabels}</div>
+    ${rows}
+    <div class="text-xs text-muted mt8">Total days hit across all ${weeks.length} weeks (bars = weekly rate)</div>
+  `;
+}
+
+function renderWeeklySummary(){
+  const today = todayKey();
+  const wts   = allWeights();
+
+  const rows = Array.from({length:6}, (_,wi) => {
+    const days = [];
+    for(let d=0;d<7;d++){
+      const dt = new Date(START);
+      dt.setDate(dt.getDate() + wi*7 + d);
+      if(dt >= DEADLINE) break;
+      days.push(dateToKey(dt));
+    }
+
+    const past = days.filter(k => k <= today);
+    if(!past.length){
+      return `<tr><td style="color:var(--muted)">W${wi+1}</td>
+              <td colspan="5" style="color:var(--muted);font-size:12px">Upcoming</td></tr>`;
+    }
+
+    const prot  = past.filter(k => ST.days[k]?.protein).length;
+    const train = past.filter(k => {
+      const dd = ST.days[k]||{};
+      if(dd.trained) return true;
+      const sp = splitFor(k);
+      return sp.exercises.some((_,i) => dd.ex && dd.ex[i]);
+    }).length;
+    const steps = past.filter(k => (ST.days[k]?.steps||0) >= STEPS_GOAL).length;
+    const sleepV = past.map(k=>ST.days[k]?.sleep).filter(Boolean);
+    const avgSlp = sleepV.length ? (sleepV.reduce((a,b)=>a+b,0)/sleepV.length).toFixed(1) : '--';
+
+    const wkWts  = wts.filter(w => days.includes(w.key));
+    let wtChg = '--';
+    if(wkWts.length >= 2){
+      const d = wkWts[wkWts.length-1].w - wkWts[0].w;
+      wtChg = (d>0?'+':'') + d.toFixed(1);
+    }
+
+    const N = past.length;
+    const bdg = (v, t) => {
+      const p = v/t;
+      const cls = p>=.8?'wk-good':p>=.5?'wk-ok':'wk-bad';
+      return `<span class="wk-badge ${cls}">${v}/${t}</span>`;
+    };
+    const slpColor = parseFloat(avgSlp)>=SLEEP_MIN ? 'var(--accent)' : 'var(--warn)';
+    const wtColor  = wtChg.startsWith('-') ? 'var(--accent)' : wtChg==='+0.0'||wtChg==='0.0'||wtChg==='--' ? 'var(--muted)' : 'var(--danger)';
+
+    return `<tr>
+      <td>W${wi+1}</td>
+      <td>${bdg(prot,N)}</td>
+      <td>${bdg(train,N)}</td>
+      <td>${bdg(steps,N)}</td>
+      <td style="color:${slpColor}">${avgSlp}h</td>
+      <td style="color:${wtColor}">${wtChg}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('wkSummary').innerHTML = `
+    <table class="wk-table">
+      <thead><tr>
+        <th></th><th>🥩</th><th>💪</th><th>👟</th><th>😴</th><th>⚖️</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="text-xs text-muted mt8">Protein · Training · Steps · Sleep avg · Weight Δ</div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER — DATA
+// ═══════════════════════════════════════════════════
+function renderData(){
+  const last = ST.lastExport;
+  document.getElementById('lastExportLbl').textContent = last
+    ? `Last export: ${new Date(last).toLocaleString()}`
+    : '⚠️ Never exported — do it now!';
+
+  const key  = todayKey();
+  const left = daysLeft();
+  document.getElementById('progInfo').innerHTML = `
+    <div class="info-grid">
+      <div class="info-cell"><div class="lbl">Start</div><div class="val">May 24, 2026</div></div>
+      <div class="info-cell"><div class="lbl">Deadline</div><div class="val">July 2, 2026</div></div>
+      <div class="info-cell"><div class="lbl">Today</div><div class="val">Day ${progDay(key)} · W${progWeek(key)}</div></div>
+      <div class="info-cell"><div class="lbl">Days Left</div><div class="val" style="color:var(--accent)">${left}</div></div>
+      <div class="info-cell"><div class="lbl">Start Weight</div><div class="val">${START_WT} lbs</div></div>
+      <div class="info-cell"><div class="lbl">Height</div><div class="val">5′10″</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="text-sm text-muted">
+      Daily targets: ${PROT_GOAL}g protein · ${CAL_GOAL} kcal ·
+      ${STEPS_GOAL.toLocaleString()} steps · 1 gal water ·
+      ${SLEEP_MIN}–${SLEEP_MAX}h sleep · 10 min mobility
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+//  EXPORT / IMPORT
+// ═══════════════════════════════════════════════════
+function exportData(){
+  ST.lastExport = new Date().toISOString();
+  saveState();
+
+  const blob = new Blob([JSON.stringify(ST, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `fittrack-${todayKey()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Data exported ✓');
+  renderData();
+}
+
+function importData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try{
+      const parsed = JSON.parse(ev.target.result);
+      ST = parsed;
+      if(!ST.days)   ST.days   = {};
+      if(!ST.photos) ST.photos = {};
+      saveState();
+      renderAll();
+      showToast('Data imported ✓');
+    } catch(err){
+      showToast('Error: bad file format');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ═══════════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════════
+let curTab = 'today';
+
+function showTab(tab){
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-'+tab).classList.add('active');
+  document.querySelectorAll('.bni').forEach(b => b.classList.remove('active'));
+  document.getElementById('bn-'+tab).classList.add('active');
+  curTab = tab;
+  if(tab==='today')    renderToday();
+  if(tab==='weight')   renderWeight();
+  if(tab==='progress') renderProgress();
+  if(tab==='data')     renderData();
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════
+function escHTML(s){
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════
+//  SUNDAY EXPORT REMINDER
+// ═══════════════════════════════════════════════════
+function checkSundayReminder(){
+  if(new Date().getDay() !== 0) return;
+  const last = ST.lastExport ? new Date(ST.lastExport) : null;
+  if(!last || dateToKey(last) !== todayKey()){
+    setTimeout(() => showToast('📦 Sunday reminder: export your backup!'), 4000);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+function renderAll(){
+  const now = new Date();
+  document.getElementById('hdrDate').textContent =
+    now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  renderToday();
+  // Pre-render weight so first switch is instant
+  if(curTab==='weight')   renderWeight();
+  if(curTab==='progress') renderProgress();
+  if(curTab==='data')     renderData();
+}
+
+renderAll();
+checkSundayReminder();
+</script>
+</body>
+</html>
